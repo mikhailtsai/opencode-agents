@@ -1,7 +1,7 @@
 ---
-description: Strict lightweight primary orchestrator for Qwen3 14B. Delegates all repository investigation and implementation.
+description: Strict deterministic primary orchestrator for Gemma 4 12B. Delegates all repository investigation and implementation.
 mode: primary
-model: llamacpp/qwen-orch-14b
+model: llamacpp/gemma-orch-12b
 temperature: 0.1
 permission:
   read: deny

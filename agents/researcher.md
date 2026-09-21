@@ -1,7 +1,7 @@
 ---
 description: Read-only repository research specialist. Use PROACTIVELY and FIRST whenever anything about the codebase is unknown — locating code, architecture analysis, execution/data-flow tracing, root-cause analysis, discovering existing behavior, conventions, and tests. Returns an evidence-backed report, never code changes.
 mode: subagent
-model: openrouter/qwen/qwen3.8-flash
+model: openrouter/z-ai/glm-5.3-flash
 temperature: 0.1
 permission:
   edit:

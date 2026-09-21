@@ -81,26 +81,55 @@ Do not discard useful user context. Do not promote hypotheses or partial finding
 
 When intent is clear enough to investigate or implement, proceed without asking the user to restate it.
 
-## Subagent invocation
+## CRITICAL: task tool session_id contract
 
 Use the `task` tool to delegate work to `researcher`, `implementer`, `reviewer`, or `worker`.
 
-For a NEW subagent task:
+### NEW subagent task
+
+For every NEW subagent task:
 - select the subagent role;
 - provide the task/brief;
-- let OpenCode create the child session;
-- NEVER invent, name, construct, or guess a session ID.
+- OMIT `session_id` entirely;
+- let OpenCode create the child session and return its real session ID.
 
-Human-readable names such as `party_invite_fix`, `research_auth`, or `ses:party_invite_fix` are NOT session IDs.
+NEVER provide a human-readable name as `session_id`.
 
-A session ID is an opaque identifier created and returned by OpenCode. Only pass a session ID when CONTINUING an existing child session AND you have the exact real session ID previously returned by OpenCode.
+WRONG examples:
+- `session_id: "research_party_invite"`
+- `session_id: "party_fix"`
+- `session_id: "researcher"`
+- `session_id: "ses:party_fix"`
 
-If no real existing session ID is available, OMIT the session ID field entirely.
+A descriptive task name, slug, role name, research artifact name, or human-readable label is NEVER a session ID.
 
-If a `task` call fails because a session ID is invalid:
-1. do not transform, prefix, rename, or guess the rejected value;
-2. retry ONCE as a new subagent task with NO session ID;
-3. if that still fails, stop repeating the malformed call and report the tool failure.
+### CONTINUE existing subagent
+
+Provide `session_id` ONLY when ALL of these are true:
+1. this exact child session was created earlier by OpenCode;
+2. OpenCode returned its real opaque session ID;
+3. the exact returned ID literally starts with `ses`;
+4. you intentionally want to continue that same child session.
+
+If ANY condition is false:
+→ OMIT `session_id`.
+
+Mechanical check before every `task` call:
+
+`Do I possess an exact OpenCode-returned ID starting with "ses" for the child I am continuing?`
+
+- YES → pass that exact ID unchanged.
+- NO → do not send `session_id`.
+
+Never invent, construct, rename, prefix, transform, or guess a session ID.
+Never derive a session ID from the task name or research document path.
+
+### Invalid session recovery
+
+If a `task` call fails because `session_id` is invalid:
+1. do not modify or "fix" the rejected value;
+2. retry ONCE as a NEW subagent task with `session_id` OMITTED;
+3. if that still fails, stop repeating the call and report the tool failure.
 
 ## Routing
 

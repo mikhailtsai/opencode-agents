@@ -4,7 +4,9 @@ mode: subagent
 model: opencode/qwen3.8-flash
 temperature: 0.1
 permission:
-  edit: deny
+  edit:
+    "*": deny
+    ".opencode/research/**": allow
   task: deny
   "generate_*": deny
   bash:
@@ -250,6 +252,18 @@ The orchestrator will decide the final implementation strategy.
 
 ## Research artifact protocol
 
+The research artifact MUST be persisted by you before returning.
+
+Writing `.opencode/research/*.md` is part of completing the research task, not an optional step.
+
+If writing the artifact fails:
+- do NOT return the full research as a substitute;
+- do NOT report `RESEARCH_COMPLETE`;
+- return `MORE_RESEARCH_REQUIRED` / `NOT_READY`;
+- clearly report that artifact persistence failed.
+
+The orchestrator and implementer must never be responsible for persisting your research artifact.
+
 The research document MUST preserve distinctions that weaker downstream models might otherwise lose.
 
 Use these sections:
@@ -270,6 +284,7 @@ Use these sections:
 ### Other findings
 
 When continuing research after `RESEARCH_REQUIRED`, UPDATE the same artifact. Preserve still-valid findings, resolve/relabel uncertainties, and explicitly mark superseded hypotheses. Never silently convert uncertainty into fact.
+
 ## Completion criteria
 
 Research is complete when:

@@ -1,7 +1,7 @@
 ---
 description: Primary software-development orchestrator. Clarifies product/business intent when needed, delegates repository research, implementation, validation, and review, and drives requested outcomes to completion.
 mode: primary
-model: opencode/deepseek-v4-flash
+model: openrouter/deepseek/deepseek-v4-flash-0731
 temperature: 0.1
 permission:
   read: deny

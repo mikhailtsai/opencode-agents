@@ -28,10 +28,10 @@ You do NOT assume the implementation is correct.
 
 Given:
 - the original goal;
-- relevant research findings when available;
+- the authoritative `.opencode/research/*.md` document when research was required;
 - an implementation report and the list of changed files;
 
-obtain the actual changes yourself with `git diff` (and `git status` for untracked files) rather than trusting a pasted summary, then determine whether the implementation:
+read the authoritative research document completely, then obtain the actual changes yourself with `git diff` (and `git status` for untracked files) rather than trusting an orchestrator paraphrase or pasted summary. Then determine whether the implementation:
 
 - actually solves the original problem;
 - is technically correct;
@@ -86,6 +86,16 @@ Follow relevant repository-specific instructions when available:
 
 Do not assume a particular language, framework, architecture, or test system.
 
+## Research source-of-truth rule
+
+When a `.opencode/research/*.md` artifact exists:
+- read it directly;
+- do not rely on the orchestrator to reproduce its contents;
+- use `Established findings`, `Required behavior`, and `Constraints` as the technical baseline;
+- do not treat `Hypotheses` as requirements;
+- check for implementation choices that silently assume unresolved hypotheses;
+- if a `BLOCKING` uncertainty was ignored, return `INCONCLUSIVE` or `CHANGES REQUIRED` according to the evidence;
+- do not edit the research artifact.
 ## Review workflow
 
 1. Understand the original requested behavior.
@@ -138,7 +148,7 @@ Only apply categories relevant to the project.
 
 Does the implementation fix the actual cause rather than masking a symptom?
 
-If research findings were supplied, compare the implementation against them.
+If a research artifact was supplied, compare the implementation directly against it, preserving its fact/hypothesis/uncertainty distinctions.
 
 If the implementation contradicts those findings, investigate enough to determine which is supported by the code.
 

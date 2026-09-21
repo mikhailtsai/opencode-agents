@@ -1,7 +1,7 @@
 ---
 description: Fast execution worker for straightforward, well-specified mechanical tasks. Use to run tests, builds, linters, and type checks, and for targeted searches, repetitive edits, and simple configuration changes. Not for investigation or design work.
 mode: subagent
-model: llamacpp/nemotron
+model: opencode/deepseek-v4-flash
 temperature: 0.1
 permission:
   task: deny

@@ -1,7 +1,7 @@
 ---
 description: Read-only software review specialist. MUST BE USED after any meaningful implementation to independently verify correctness, regressions, architecture consistency, edge cases, and test coverage. Reads the diff itself and returns a status with evidence-backed findings.
 mode: subagent
-model: llamacpp/qwen-local
+model: opencode/qwen3.8-flash
 temperature: 0.1
 permission:
   edit: deny

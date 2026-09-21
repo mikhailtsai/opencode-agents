@@ -1,7 +1,7 @@
 ---
 description: Product/business discovery subagent. Clarifies the business value, user scenarios, actors, inputs/outputs, business rules, scope, and acceptance behavior of new or materially changed features through short, high-value questions. Does not inspect code or choose technical architecture.
 mode: subagent
-model: opencode/qwen3.8-flash
+model: openrouter/qwen/qwen3.8-flash
 temperature: 0.2
 permission:
   read: deny

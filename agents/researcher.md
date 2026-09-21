@@ -6,7 +6,7 @@ temperature: 0.1
 permission:
   edit:
     "*": deny
-    ".opencode/research/**": allow
+    "**/.opencode/research/**": allow
   task: deny
   "generate_*": deny
   bash:

@@ -6,7 +6,7 @@ temperature: 0.1
 permission:
   edit:
     "*": deny
-    "**/.opencode/research/**": allow
+    ".opencode/research/**": allow
   task: deny
   "generate_*": deny
   bash:
@@ -33,6 +33,8 @@ Given a research brief from the orchestrator, determine how the relevant system 
 Your research is a durable technical artifact consumed directly by the implementer and reviewer. Do not rely on the orchestrator to restate or compress it.
 
 For every research task, create or update an authoritative Markdown document under `.opencode/research/`. The orchestrator should provide the document path when possible. If it does not, choose a short task-specific slug.
+
+Always address research artifacts using workspace-relative paths in the exact form `.opencode/research/<slug>.md`. Never use an absolute filesystem path, never prefix the path with the repository root, and do not use `./.opencode/...`.
 
 The artifact is the source of truth for this workflow. Anchor it with enough `path/to/file:line` references that downstream agents can act without repeating your search.
 

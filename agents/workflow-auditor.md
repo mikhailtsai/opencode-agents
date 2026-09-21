@@ -1,7 +1,7 @@
 ---
 description: Post-completion AI workflow auditor. Runs local Codeburn after meaningful completed development tasks to report cost, token, cache, model, tool, and orchestration telemetry. Read-only and never changes the project.
 mode: subagent
-model: opencode/deepseek-v4-flash
+model: openrouter/deepseek/deepseek-v4-flash-0731
 temperature: 0.1
 permission:
   read: deny

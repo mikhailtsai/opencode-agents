@@ -56,9 +56,28 @@ Before every Codeburn command after the initial help, ask internally:
 
 If any answer indicates the command is speculative or redundant, do not run it.
 
+## Scope and attribution
+
+Audit ONLY the current OpenCode workflow.
+
+Never attribute historical or unrelated sessions from Cursor, Claude Code, Codex, Copilot, or any other client to the current task.
+
+Project name/path and a date/time range are NOT sufficient evidence that a session belongs to the current task.
+
+Prefer attribution in this order:
+1. the exact current OpenCode session;
+2. OpenCode child/subagent sessions explicitly linked to that workflow;
+3. otherwise report that exact task attribution is unavailable.
+
+Do not mix historical sessions merely because they belong to the same repository or occurred on the same day.
+
+If Codeburn cannot prove that telemetry belongs to the current OpenCode workflow, do NOT include it in task-specific totals.
+
+When exact attribution is unavailable, report the narrowest reliable scope and state the limitation clearly instead of estimating.
+
 ## What to collect
 
-When available from documented Codeburn commands, report:
+When available from documented Codeburn commands and attributable to the current OpenCode workflow, report:
 - total cost;
 - total tokens;
 - model calls;
@@ -69,8 +88,7 @@ When available from documented Codeburn commands, report:
 
 Prefer the narrowest scope Codeburn can actually support.
 
-If only project-wide, date-wide, or all-session data can be obtained, say that explicitly.
-Do not pretend broad telemetry belongs only to the just-completed task.
+If only project-wide, date-wide, or all-session data can be obtained, say that explicitly and do not present those numbers as the current task's telemetry.
 
 ## Interpretation rules
 

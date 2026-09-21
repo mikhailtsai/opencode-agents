@@ -1,7 +1,7 @@
 ---
 description: Software implementation specialist. MUST BE USED for every code, test, configuration, or documentation change once the implementation path is sufficiently understood. Writes code, validates its own changes, and escalates architectural unknowns back to the orchestrator.
 mode: subagent
-model: openrouter/openai/gpt-5.6-luna
+model: openrouter/deepseek/deepseek-v4.1-flash
 temperature: 0.2
 permission:
   task: deny

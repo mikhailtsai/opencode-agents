@@ -1,0 +1,17 @@
+{
+  "variant": "cheap",
+  "agents": {
+    "orchestrator": "openrouter/inclusionai/ling-3.0-flash",
+    "product-analyst": "openrouter/inclusionai/ling-3.0-flash",
+    "system-analyst": "openrouter/inclusionai/ling-3.0-flash",
+    "researcher": "openrouter/inclusionai/ling-3.0-flash",
+    "implementer": "openrouter/inclusionai/ling-3.0-flash",
+    "worker": "openrouter/inclusionai/ling-3.0-flash",
+    "test-engineer": "openrouter/inclusionai/ling-3.0-flash",
+    "reviewer": "openrouter/inclusionai/ling-3.0-flash",
+    "requirements-reviewer": "openrouter/inclusionai/ling-3.0-flash",
+    "security-reviewer": "openrouter/inclusionai/ling-3.0-flash",
+    "architect": "openrouter/openai/gpt-oss-120b",
+    "oracle": "openrouter/openai/gpt-oss-120b"
+  }
+}

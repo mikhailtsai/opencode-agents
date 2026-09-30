@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Resolve the real repository location even when this script is symlinked into PATH.
+SOURCE="${BASH_SOURCE[0]}"
+while [[ -L "$SOURCE" ]]; do
+  DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ "$SOURCE" != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+REPO_DIR="$(cd -P "$(dirname "$SOURCE")/.." && pwd)"
+
+usage() {
+  cat <<'EOF'
+opencode-agents - install and validate the OpenCode agent workflow in a repository
+
+Usage:
+  opencode-agents install [normal|cheap|local] [--target DIR]
+      Install the workflow into DIR (default: current directory).
+
+  opencode-agents check
+      Run scripts/check-harness.py (searches upward for an installed project).
+
+  opencode-agents report
+      Run scripts/eval-report.py (searches upward for an installed project).
+
+  opencode-agents help
+      Show this help.
+
+Examples:
+  cd /path/to/project && opencode-agents install
+  opencode-agents install cheap
+  opencode-agents install local
+  opencode-agents install normal --target /path/to/project
+EOF
+}
+
+run_script() {
+  local name="$1"
+  local dir="$PWD"
+  while :; do
+    if [[ -f "$dir/scripts/$name" ]]; then
+      exec python3 "$dir/scripts/$name"
+    fi
+    [[ "$dir" == "/" ]] && break
+    dir="$(dirname "$dir")"
+  done
+  echo "opencode-agents: scripts/$name not found; run 'opencode-agents install' first" >&2
+  exit 1
+}
+
+command="${1:-help}"
+shift || true
+
+case "$command" in
+  install)
+    mode="normal"
+    target="$PWD"
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        normal|cheap|local) mode="$1"; shift ;;
+        -t|--target) target="${2:?--target requires a directory}"; shift 2 ;;
+        -h|--help) usage; exit 0 ;;
+        *) echo "opencode-agents: unknown install option '$1'" >&2; usage; exit 1 ;;
+      esac
+    done
+    exec bash "$REPO_DIR/install.sh" "$target" "$mode"
+    ;;
+  check) run_script check-harness.py ;;
+  report) run_script eval-report.py ;;
+  help|-h|--help) usage ;;
+  *)
+    echo "opencode-agents: unknown command '$command'" >&2
+    usage
+    exit 1
+    ;;
+esac

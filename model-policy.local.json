@@ -1,0 +1,17 @@
+{
+  "variant": "local",
+  "agents": {
+    "orchestrator": "llamacpp/qwen-orch-14b",
+    "product-analyst": "llamacpp/gemma-orch-12b",
+    "system-analyst": "llamacpp/gemma-orch-12b",
+    "researcher": "llamacpp/gemma-orch-12b",
+    "implementer": "llamacpp/qwen-orch-14b",
+    "worker": "llamacpp/nemotron",
+    "test-engineer": "llamacpp/qwen-orch-14b",
+    "reviewer": "llamacpp/qwen-orch-14b",
+    "requirements-reviewer": "llamacpp/gemma-orch-12b",
+    "security-reviewer": "llamacpp/qwen-orch-14b",
+    "architect": "llamacpp/qwen-local",
+    "oracle": "llamacpp/qwen-local"
+  }
+}

@@ -5,7 +5,6 @@ temperature: 0.2
 permission:
   edit: deny
   task: deny
-  "generate_*": deny
   webfetch: deny
   websearch: deny
   bash:

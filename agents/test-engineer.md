@@ -4,7 +4,6 @@ mode: subagent
 temperature: 0.1
 permission:
   task: deny
-  "generate_*": allow
   webfetch: deny
   websearch: deny
 ---

@@ -1,11 +1,7 @@
 ---
 description: Read-only investigator. Use before implementation when repository context, execution paths, constraints, or root cause must be established. Returns evidence-backed findings, never code changes.
 mode: subagent
-model: openrouter/deepseek/deepseek-v4.1-flash
 temperature: 0.1
-options:
-  reasoning:
-    effort: high
 permission:
   edit: deny
   task: deny

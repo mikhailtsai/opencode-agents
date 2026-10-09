@@ -1,11 +1,7 @@
 ---
 description: Focused coding agent for well-scoped multi-file implementation after requirements and context are understood. Use for every code, test, config, or documentation change.
 mode: subagent
-model: openrouter/deepseek/deepseek-v4.1-flash
 temperature: 0.2
-options:
-  reasoning:
-    effort: high
 permission:
   task: deny
   "generate_*": allow

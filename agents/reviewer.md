@@ -1,11 +1,7 @@
 ---
 description: Independent read-only reviewer focused on correctness, regressions, contracts, architecture risks, and missing validation. Use after meaningful implementation.
 mode: subagent
-model: openrouter/deepseek/deepseek-v4.1-flash
 temperature: 0.1
-options:
-  reasoning:
-    effort: high
 permission:
   edit: deny
   task: deny

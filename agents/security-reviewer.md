@@ -1,11 +1,7 @@
 ---
 description: On-demand security reviewer for auth, authorization, payments, secrets, untrusted input, data exposure, network boundaries, and sensitive integrations. Use only for security-sensitive changed surfaces.
 mode: subagent
-model: openrouter/deepseek/deepseek-v4.1-flash
 temperature: 0.1
-options:
-  reasoning:
-    effort: high
 permission:
   edit: deny
   task: deny

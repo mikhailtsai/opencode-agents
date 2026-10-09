@@ -1,27 +1,23 @@
 # Agent workflow
 
-OpenCode is the runtime. This repository adds only a project-local workflow layer.
-The model mapping lives in `model-policy.json` and is enforced by `scripts/check-harness.py`. The
-normal variant keeps the default agents on `openrouter/deepseek/deepseek-v4.1-flash` with high
-reasoning and runs the rare escalation roles (`architect`, `oracle`) on `openrouter/z-ai/glm-5.3-flash`.
-The `cheap` install variant swaps in much cheaper OpenRouter models, and the `local` variant routes to
-the local llama.cpp server (`llamacpp` provider). Do not escalate by habit.
+OpenCode is the runtime. These agents are installed globally (`~/.config/opencode/agent/`, skills in
+`~/.config/opencode/skills/`) and apply in every repository. Agents carry no hardcoded model: they
+inherit the OpenCode default model, and escalation is a role choice, not a model pin.
 
 ## Default policy
 
-Economical model first. The primary session may itself use the default model.
 Use the default agents for almost all analysis, implementation, testing, and review.
-
 Escalation is exceptional:
-- `architect`: consequential architecture decisions, conflicting evidence, or repeated default-model failure.
+- `architect`: consequential architecture decisions, conflicting evidence, or repeated default-agent failure.
 - `oracle`: only when `architect` still cannot resolve a high-impact blocker.
 
 ## Map
 
 - Existing project docs remain authoritative.
-- Agent definitions live in `agents/` and install into `.opencode/agents/`.
-- Reusable skills live in `.opencode/skills/` (`bootstrap-project`, `debug`, `plan`, `verify`,
-  `review-loop`, `improve-harness`, `docs-gardening`, `record-outcome`, `evaluate-harness`).
+- Agent definitions live in `agents/` and install globally to `~/.config/opencode/agent/`.
+- Reusable skills live in `.opencode/skills/` and install globally to `~/.config/opencode/skills/`
+  (`bootstrap-project`, `debug`, `plan`, `verify`, `review-loop`, `improve-harness`, `docs-gardening`,
+  `record-outcome`, `evaluate-harness`).
 - `docs/agent/` holds missing agent-facing maps; `docs/exec-plans/` holds durable plans.
 - `.opencode-evals/` holds compact non-sensitive outcomes from real tasks; it is evidence for
   improving this workflow, not raw telemetry.
@@ -99,6 +95,6 @@ real user corrections, regressions, and accumulated outcomes. Improve recurring 
 rather than reacting to isolated anecdotes. Never store prompts, secrets, source code, personal
 data, or raw telemetry in any outcome journal.
 
-The last Codeburn review is tracked in `.opencode-evals/codeburn-state.json`. The orchestrator checks
-it after substantial work and suggests `evaluate-harness` when the review is due; `evaluate-harness`
-records each run with `python3 scripts/codeburn_state.py mark`.
+The last Codeburn review is tracked in `.opencode-evals/codeburn-state.json`. The review runs once a
+day (`interval_days: 1`); `evaluate-harness` records each run with
+`python3 scripts/codeburn_state.py mark`.

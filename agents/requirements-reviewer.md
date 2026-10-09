@@ -1,11 +1,7 @@
 ---
 description: Independent acceptance reviewer. Checks whether the delivered behavior actually satisfies the user's/product requirements and acceptance criteria.
 mode: subagent
-model: openrouter/deepseek/deepseek-v4.1-flash
 temperature: 0.1
-options:
-  reasoning:
-    effort: high
 permission:
   edit: deny
   task: deny

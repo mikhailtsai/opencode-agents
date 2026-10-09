@@ -1,11 +1,7 @@
 ---
 description: Independent test engineer for behavior verification, regression coverage, edge cases, and failure modes. Use to independently validate non-trivial changes.
 mode: subagent
-model: openrouter/deepseek/deepseek-v4.1-flash
 temperature: 0.1
-options:
-  reasoning:
-    effort: high
 permission:
   task: deny
   "generate_*": allow

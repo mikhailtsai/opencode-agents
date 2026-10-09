@@ -1,106 +1,41 @@
 # OpenCode Agents
 
-A repository-local multi-agent workflow kit for [OpenCode](https://opencode.ai): specialized agents,
-progressive-disclosure skills, deterministic validation, an outcome journal, and a small harness-improvement loop.
+A **model-agnostic, globally-installed** multi-agent workflow kit for [OpenCode](https://opencode.ai):
+specialized agents, progressive-disclosure skills, and an evaluation journal. Agents carry no
+hardcoded model and only the tools, skills, and permissions their role needs.
 
-It is a port of the [`codex-agents`](https://github.com/mikhailtsai/codex-agents) workflow kit to OpenCode.
-The goal is to get reliable software work out of economical models by delegating bounded tasks to the
-smallest useful team and escalating only when evidence justifies the cost.
+It is a port of the [`codex-agents`](https://github.com/mikhailtsai/codex-agents) workflow kit to
+OpenCode. The goal is reliable software work by delegating bounded tasks to the smallest useful team
+and escalating only when evidence justifies the cost.
 
-OpenCode is the runtime. This repository adds only the workflow layer: agent definitions, skills,
+OpenCode is the runtime. This repository defines the workflow layer: agent definitions, skills,
 knowledge-map scaffolding, a validation gate, and an evaluation journal. It does not replace your
 project's build system, tests, documentation, or security boundary.
 
 ## Philosophy
 
-- **Economical model first.** The primary session and most agents run on the cheap default model; escalation is exceptional.
+- **Role isolation over prompt rules.** Each agent gets exactly the tools, skills, and permissions its role needs — nothing more.
+- **No model hardcoding.** Agents inherit the OpenCode default model. Escalation is a role choice, not a model pin.
 - **A map, not a manual.** `AGENTS.md` is a short router. Detail lives in skills and the closest authoritative artifact.
-- **Enforceable invariants over prose.** Model routing, agent shape, and journal integrity are checked by a script, not by hope.
+- **Enforceable invariants over prose.** Agent shape and journal integrity are checked by a script, not by hope.
 - **Progressive disclosure.** `SKILL.md` procedures load on demand instead of bloating every agent prompt.
 - **Evidence over confidence.** Deterministic checks and independent reviews beat agent self-assessment.
 - **Improve the repository, not the prompt.** Recurring failures become checks, docs, or guardrails.
 
 ## Requirements
 
-- OpenCode (agents live in `.opencode/agents/`, skills in `.opencode/skills/`).
-- One of:
-  - OpenRouter access (`OPENROUTER_API_KEY`) for the `normal` and `cheap` variants, or
-  - a local llama.cpp OpenAI-compatible server for the `local` variant (see `llamacpp` provider below).
-- `python3` with PyYAML (used by the installer and validation scripts).
+- OpenCode.
+- `python3` with PyYAML (used by the validation scripts).
 
-## Install
+## Install (global)
 
-```
-bash install.sh <target-dir> [normal|cheap|local]   # default: normal
-```
+Agents and skills are installed **globally** so they are available in every repository:
 
-Files are **copied (replaced)**, not symlinked. Managed agent, skill, script, and `model-policy.json`
-files are overwritten on each run. Project-owned docs (`docs/agent/README.md`) and eval state
-(`codeburn-state.json`, `runs.jsonl`) are created only if absent. The selected variant patches the
-installed agent models from the matching `model-policy*.json`.
+- Agents → `~/.config/opencode/agent/` (or `$OPENCODE_CONFIG_DIR/agent`)
+- Skills → `~/.config/opencode/skills/` (or `$OPENCODE_CONFIG_DIR/skills`)
 
-### Global command
-
-`bin/opencode-agents` is a wrapper you can put on `PATH` to install from anywhere:
-
-```
-ln -sf "$PWD/bin/opencode-agents" ~/.local/bin/opencode-agents   # or any PATH dir
-
-cd /path/to/project && opencode-agents install          # normal, current dir
-opencode-agents install cheap                            # cheap variant
-opencode-agents install local                            # local llama.cpp models
-opencode-agents install normal --target /path/to/project
-opencode-agents check                                    # run check-harness
-opencode-agents report                                   # run eval-report
-```
-
-After installing, restart OpenCode so project agents and skills are loaded.
-
-### AGENTS.md merge
-
-The workflow map is merged into `AGENTS.md` via a managed block:
-
-```
-<!-- opencode-agents:begin -->
-...kit routing and completion policy...
-<!-- opencode-agents:end -->
-```
-
-- No `AGENTS.md` → it is created containing the block.
-- Existing `AGENTS.md` → the block is **appended**; the project's own content is preserved.
-- Re-running install (or switching variant) → the existing block is replaced in place, no duplicates.
-
-The merge never deletes project-authored content.
-
-## Model variants
-
-The model mapping is defined per agent in `model-policy.json` and enforced by `scripts/check-harness.py`.
-The installer swaps in `model-policy.cheap.json` or `model-policy.local.json` for those variants.
-
-### normal
-
-- `architect`, `oracle`: `openrouter/z-ai/glm-5.3-flash`.
-- All other agents (including `orchestrator`): `openrouter/deepseek/deepseek-v4.1-flash`.
-
-### cheap
-
-Swaps DeepSeek/GLM for much cheaper OpenRouter models (~6x cheaper on output for routine roles):
-
-- `architect`, `oracle`: `openrouter/openai/gpt-oss-120b`.
-- All other agents: `openrouter/inclusionai/ling-3.0-flash`.
-
-### local
-
-Routes to a local llama.cpp server via the `llamacpp` provider (`http://127.0.0.1:8642/v1`).
-Speed-oriented: the heavy models are reserved for the rare escalation roles.
-
-- `architect`, `oracle`: `llamacpp/qwen-local` (Qwen 3.8 27B — rare, quality over latency).
-- `orchestrator`, `implementer`, `test-engineer`, `reviewer`, `security-reviewer`: `llamacpp/qwen-orch-14b` (Qwen3 14B).
-- `worker`: `llamacpp/nemotron` (Nemotron Nano 12B — fastest).
-- `product-analyst`, `system-analyst`, `researcher`, `requirements-reviewer`: `llamacpp/gemma-orch-12b` (Gemma 4 12B).
-
-The `llamacpp` provider and model names come from your global OpenCode config; edit
-`model-policy.local.json` to match your own models.
+There is no per-project installer. Copy (or symlink) this repository's `agents/*.md` and
+`.opencode/skills/*` into those global directories, then restart OpenCode.
 
 ## Agents
 
@@ -147,10 +82,10 @@ Then run `evaluate-harness` to correlate the two, find repeated failure classes,
 `improve-harness` for the smallest durable fix. Never store prompts, code, secrets, or raw telemetry
 in the journal.
 
-Last-review tracking: `.opencode-evals/codeburn-state.json` is updated by `evaluate-harness`
-(`python3 scripts/codeburn_state.py mark`). The orchestrator runs
-`python3 scripts/codeburn_state.py check` after substantial work and suggests `evaluate-harness`
-when the review is due (default interval: 7 days).
+Last-review tracking: the orchestrator compares the last run at the start of a session and, when a
+review is due (daily, `interval_days: 1`), runs `codeburn overview` and records it. State lives in
+`.opencode-evals/codeburn-state.json`; use `scripts/codeburn_state.py check|mark` (exit 0 = due,
+2 = not due). Global agents find the script via `$OPENCODE_AGENTS_HOME`.
 
 ## Validation
 
@@ -161,37 +96,29 @@ python3 scripts/check-harness.py
 python3 scripts/eval-report.py
 ```
 
-`check-harness.py` validates agent frontmatter and mode, the model policy in `model-policy.json`,
-skill frontmatter, `AGENTS.md` discoverability, required artifacts, the journal, and the Codeburn
-state file. `eval-report.py` validates the same journal and computes outcome/retry/escalation metrics.
-Both work in the source kit layout (`agents/`) and after installation (`.opencode/agents/`).
-Requires PyYAML.
+`check-harness.py` validates agent frontmatter and mode, skill frontmatter, `AGENTS.md`
+discoverability, required artifacts, the journal, and the Codeburn state file. `eval-report.py`
+validates the same journal and computes outcome/retry/escalation metrics. Both work in the source
+layout (`agents/`). Requires PyYAML.
 
 ## Repository layout
 
 ```
-agents/                     agent definitions (source layout)
+agents/                     agent definitions (model-agnostic)
 .opencode/skills/           9 progressive-disclosure skills
-bin/opencode-agents         global installer/check wrapper
 scripts/
-  check-harness.py          structural + policy gate
+  check-harness.py          structural gate
   eval-report.py            journal metrics
   eval_schema.py            shared journal schema validation
   codeburn_state.py         Codeburn last-run tracking (check/mark)
-  apply-model-policy.py     rewrites agent models from a policy
-  merge-agents-md.py        managed-block AGENTS.md merge
-model-policy.json           normal model mapping (source of truth)
-model-policy.cheap.json     cheap variant mapping
-model-policy.local.json     local variant mapping
 .opencode-evals/            evaluation journal + Codeburn state
 docs/agent/                 agent knowledge map (built by bootstrap-project)
 docs/exec-plans/            durable active/completed plans
 AGENTS.md                   routing and completion policy
-install.sh                  installer
 ```
 
 ## Scope
 
-This kit defines the workflow inside one project. It intentionally does not implement scheduling,
+This kit defines a reusable workflow across projects. It intentionally does not implement scheduling,
 worktrees, deployment, CI, or project-specific tests. It complements, rather than replaces, OpenCode's
 built-in agents and your project's own tooling.

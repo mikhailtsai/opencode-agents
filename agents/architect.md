@@ -1,11 +1,7 @@
 ---
 description: Escalation architect for consequential cross-cutting design decisions that the default agents cannot resolve confidently. Use sparingly.
 mode: subagent
-model: openrouter/z-ai/glm-5.3-flash
 temperature: 0.1
-options:
-  reasoning:
-    effort: high
 permission:
   edit: deny
   task: deny

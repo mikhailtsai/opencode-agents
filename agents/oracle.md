@@ -1,11 +1,7 @@
 ---
 description: Very rare final escalation for a high-impact reasoning blocker that remains unresolved after the architect escalation.
 mode: subagent
-model: openrouter/z-ai/glm-5.3-flash
 temperature: 0.1
-options:
-  reasoning:
-    effort: high
 permission:
   edit: deny
   task: deny

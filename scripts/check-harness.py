@@ -3,8 +3,8 @@
 
 Run: python3 scripts/check-harness.py
 
-Validates agent frontmatter, the model-routing policy, skill frontmatter, AGENTS.md
-discoverability, required directories/artifacts, and the evaluation journal.
+Validates agent frontmatter, skill frontmatter, AGENTS.md discoverability,
+required directories/artifacts, and the evaluation journal.
 """
 from pathlib import Path
 import json
@@ -32,15 +32,6 @@ if not AGENTS_DIR.is_dir():
     AGENTS_DIR = ROOT / "agents"
 
 errors = []
-
-POLICY_PATH = ROOT / "model-policy.json"
-POLICY_AGENTS = {}
-if POLICY_PATH.is_file():
-    try:
-        POLICY_AGENTS = json.loads(POLICY_PATH.read_text(encoding="utf-8")).get("agents", {})
-    except (OSError, ValueError, AttributeError) as error:
-        errors.append(f"model-policy.json: invalid policy: {error}")
-        POLICY_AGENTS = {}
 
 EXPECTED_AGENTS = {
     "product-analyst",
@@ -101,7 +92,7 @@ for path in agent_paths:
         fail(f"{rel}: invalid frontmatter: {e}")
         continue
 
-    for field in ("description", "model", "mode"):
+    for field in ("description", "mode"):
         if not data.get(field):
             fail(f"{rel}: missing required field {field!r}")
 
@@ -111,19 +102,7 @@ for path in agent_paths:
     if path.stem in EXPECTED_AGENTS and mode != "subagent":
         fail(f"{rel}: subagent must use mode 'subagent', got {mode!r}")
 
-    model = data.get("model")
-    expected = POLICY_AGENTS.get(path.stem)
-    if expected is None:
-        fail(f"{rel}: no model defined in model-policy.json for '{path.stem}'")
-    elif model != expected:
-        fail(f"{rel}: expected model {expected!r} from model-policy.json, got {model!r}")
-
-    effort = (data.get("options") or {}).get("reasoning", {})
-    effort = effort.get("effort") if isinstance(effort, dict) else None
-    if effort not in {"low", "medium", "high"}:
-        fail(f"{rel}: options.reasoning.effort must be low|medium|high, got {effort!r}")
-
-# --- Skills -----------------------------------------------------------------
+    # --- Skills -----------------------------------------------------------------
 skill_paths = sorted((ROOT / ".opencode/skills").glob("*/SKILL.md"))
 skills = {p.parent.name for p in skill_paths}
 for name in sorted(EXPECTED_SKILLS - skills):
@@ -158,7 +137,6 @@ for name in sorted(EXPECTED_SKILLS & skills):
 # --- Required artifacts and directories ------------------------------------
 required_files = [
     "AGENTS.md",
-    "model-policy.json",
     ".opencode-evals/README.md",
     ".opencode-evals/runs.jsonl",
     ".opencode-evals/codeburn-state.json",
@@ -166,9 +144,6 @@ required_files = [
     "scripts/eval-report.py",
     "scripts/eval_schema.py",
     "scripts/codeburn_state.py",
-    "scripts/apply-model-policy.py",
-    "scripts/merge-agents-md.py",
-    "docs/agent/README.md",
 ]
 for rel in required_files:
     if not (ROOT / rel).is_file():

@@ -84,17 +84,18 @@ in the journal.
 
 ## Validation
 
-Run the local gate from the repository root:
+Run the structural gate from the repository root:
 
 ```
-python3 scripts/check-harness.py
-python3 scripts/eval-report.py
+python3 scripts/check-roster.py
 ```
 
-`check-harness.py` validates agent frontmatter and mode, skill frontmatter, `AGENTS.md`
-discoverability, required artifacts, and the journal. `eval-report.py`
-validates the same journal and computes outcome/retry/escalation metrics. Both work in the source
-layout (`agents/`). Requires PyYAML.
+`check-roster.py` cross-checks the source `agents/*.md`, the deployed global agents
+(`$OPENCODE_CONFIG_DIR/agent`), and the authoritative map in `AGENTS.md`: every enabled subagent
+must be allow-listed in the orchestrator's `permission.task`, `researcher` must keep web access, and
+`AGENTS.md` must only reference existing agents. Requires PyYAML.
+
+`eval-report.py` summarizes and validates the outcome journal (`.opencode-evals/runs.jsonl`).
 
 ## Repository layout
 
@@ -102,7 +103,7 @@ layout (`agents/`). Requires PyYAML.
 agents/                     agent definitions (model-agnostic)
 .opencode/skills/           9 progressive-disclosure skills
 scripts/
-  check-harness.py          structural gate
+  check-roster.py           agent/roster structural gate
   eval-report.py            journal metrics
   eval_schema.py            shared journal schema validation
 .opencode-evals/            evaluation journal

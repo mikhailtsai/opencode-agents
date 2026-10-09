@@ -1,6 +1,6 @@
 """Shared validation for the repository-local evaluation journal.
 
-Used by both check-harness.py and eval-report.py.
+Used by eval-report.py.
 """
 
 VALID_OUTCOMES = {"PASS", "FAIL", "HUMAN_CORRECTION", "REGRESSION"}

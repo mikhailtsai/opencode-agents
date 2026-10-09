@@ -1,11 +1,14 @@
 # Agent workflow
 
 OpenCode is the runtime. This repository adds only a project-local workflow layer.
-The model mapping lives in `model-policy.json` and is enforced by `scripts/check-harness.py`. The
-normal variant keeps the default agents on `openrouter/deepseek/deepseek-v4.1-flash` with high
-reasoning and runs the rare escalation roles (`architect`, `oracle`) on `openrouter/z-ai/glm-5.3-flash`.
-The `cheap` install variant swaps in much cheaper OpenRouter models, and the `local` variant routes to
-the local llama.cpp server (`llamacpp` provider). Do not escalate by habit.
+Model and reasoning settings live in `model-policy.json` and are enforced by
+`scripts/check-harness.py`. The normal variant uses GPT-6 Luna for bounded research/analysis
+(medium) and mechanical work (low), DeepSeek V4.1 Flash for orchestration, implementation,
+testing, acceptance, and security review (high), and GLM-5.3 Flash for independent code review (high).
+Rare escalation uses GPT-6.1 Sol: `architect` high, then `oracle` xhigh on the same model.
+The `cheap` variant uses Ling reasoning toggles and GPT OSS 120B medium/high for escalation.
+The `local` variant keeps the configured llama.cpp models and leaves reasoning to the server.
+See README for provider capabilities and evaluation guidance. Do not escalate by habit.
 
 ## Default policy
 
@@ -14,7 +17,8 @@ Use the default agents for almost all analysis, implementation, testing, and rev
 
 Escalation is exceptional:
 - `architect`: consequential architecture decisions, conflicting evidence, or repeated default-model failure.
-- `oracle`: only when `architect` still cannot resolve a high-impact blocker.
+- `oracle`: only when `architect` still cannot resolve a high-impact blocker; increases reasoning budget on the same model.
+- GPT-6 Astra is an explicit exceptional final escalation, not an installed default.
 
 ## Map
 

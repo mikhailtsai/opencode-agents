@@ -1,23 +1,23 @@
 ---
-description: Escalation architect for consequential cross-cutting design decisions that the default agents cannot resolve confidently. Use sparingly.
+description: Escalation architect for consequential cross-cutting design decisions
+  that the default agents cannot resolve confidently. Use sparingly.
 mode: subagent
-model: openrouter/z-ai/glm-5.3-flash
-temperature: 0.1
+model: openrouter/openai/gpt-6.1-sol
 options:
   reasoning:
     effort: high
 permission:
   edit: deny
   task: deny
-  "generate_*": deny
+  generate_*: deny
   webfetch: deny
   websearch: deny
   bash:
-    "*": deny
-    "git status*": allow
-    "git diff*": allow
-    "git log*": allow
-    "git show*": allow
+    '*': deny
+    git status*: allow
+    git diff*: allow
+    git log*: allow
+    git show*: allow
 ---
 
 You are an escalation layer, not a default participant.

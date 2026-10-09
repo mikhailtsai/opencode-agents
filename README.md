@@ -37,7 +37,7 @@ bash install.sh <target-dir> [normal|cheap|local]   # default: normal
 Files are **copied (replaced)**, not symlinked. Managed agent, skill, script, and `model-policy.json`
 files are overwritten on each run. Project-owned docs (`docs/agent/README.md`) and eval state
 (`codeburn-state.json`, `runs.jsonl`) are created only if absent. The selected variant patches the
-installed agent models from the matching `model-policy*.json`.
+installed agent models and reasoning from the matching `model-policy*.json`.
 
 ### Global command
 
@@ -75,19 +75,36 @@ The merge never deletes project-authored content.
 ## Model variants
 
 The model mapping is defined per agent in `model-policy.json` and enforced by `scripts/check-harness.py`.
-The installer swaps in `model-policy.cheap.json` or `model-policy.local.json` for those variants.
+The installer applies both models and provider-specific reasoning from `model-policy.cheap.json` or `model-policy.local.json` for those variants. Each policy declares the supported reasoning controls and temperature capability for its selected provider routes.
 
 ### normal
 
-- `architect`, `oracle`: `openrouter/z-ai/glm-5.3-flash`.
-- All other agents (including `orchestrator`): `openrouter/deepseek/deepseek-v4.1-flash`.
+A balanced mixed-model profile:
+
+| Roles | Model | Reasoning |
+|---|---|---|
+| `worker` | `openrouter/openai/gpt-6-luna` | low |
+| `product-analyst`, `system-analyst`, `researcher` | `openrouter/openai/gpt-6-luna` | medium |
+| `orchestrator`, `implementer`, `test-engineer`, `requirements-reviewer`, `security-reviewer` | `openrouter/deepseek/deepseek-v4.1-flash` | high |
+| `reviewer` | `openrouter/z-ai/glm-5.3-flash` | high |
+| `architect` | `openrouter/openai/gpt-6.1-sol` | high |
+| `oracle` | `openrouter/openai/gpt-6.1-sol` | xhigh |
+
+The reviewer uses a different model family from the implementer. The oracle increases reasoning
+budget on the same Sol model; it is not a separate model tier. GPT-6 Astra may be explicitly
+selected for an exceptional final escalation but is not installed as a default.
 
 ### cheap
 
-Swaps DeepSeek/GLM for much cheaper OpenRouter models (~6x cheaper on output for routine roles):
+An explicitly inexpensive profile, not an equivalent-quality replacement:
 
-- `architect`, `oracle`: `openrouter/openai/gpt-oss-120b`.
-- All other agents: `openrouter/inclusionai/ling-3.0-flash`.
+- Routine roles: `openrouter/inclusionai/ling-3.0-flash`.
+- `worker`: reasoning disabled; other Ling roles: reasoning enabled.
+- `architect`: `openrouter/openai/gpt-oss-120b`, medium effort.
+- `oracle`: the same GPT OSS model, high effort.
+
+Ling advertises a reasoning toggle, not low/medium/high effort. The installer uses the toggle
+instead of carrying an unsupported effort over from the normal profile.
 
 ### local
 
@@ -100,7 +117,50 @@ Speed-oriented: the heavy models are reserved for the rare escalation roles.
 - `product-analyst`, `system-analyst`, `researcher`, `requirements-reviewer`: `llamacpp/gemma-orch-12b` (Gemma 4 12B).
 
 The `llamacpp` provider and model names come from your global OpenCode config; edit
-`model-policy.local.json` to match your own models.
+`model-policy.local.json` to match your own models. The local policy removes OpenRouter reasoning
+overrides. Thinking behavior depends on your model, chat template, and server configuration;
+these aliases do not establish support for an effort parameter.
+
+### Customizing reasoning
+
+The `agents` map retains model strings. `reasoning` supplies one setting per role, and `models`
+declares the selected provider's capabilities. For example:
+
+```json
+{
+  "agents": {"worker": "openrouter/openai/gpt-6-luna"},
+  "reasoning": {"worker": {"effort": "low"}},
+  "models": {
+    "openrouter/openai/gpt-6-luna": {
+      "efforts": ["low", "medium", "high", "xhigh", "max"],
+      "toggle": false,
+      "temperature": false
+    }
+  }
+}
+```
+
+This fragment illustrates the schema; complete policies must cover all shipped roles and include
+`variant`. Use `{"enabled": true}` or `{"enabled": false}` for a supported reasoning toggle,
+or `null` to use the provider/server default without sending a reasoning override.
+
+Capability metadata was checked against [models.dev](https://github.com/anomalyco/models.dev/tree/dev/providers/openrouter/models)
+on 2026-10-08. Update the metadata from your selected provider route when changing a model; it
+is a declared compatibility contract, not live API discovery. DeepSeek V4.1 Flash and GLM-5.3
+Flash advertise low/high/max, not medium. OpenRouter options use `options.reasoning`; they are
+not portable parameters for every provider. The installer clears stale reasoning/variant overrides
+and removes temperature for models that do not support it, while retaining unrelated options.
+
+### Evaluating model changes
+
+These profiles are defaults to evaluate, not measured quality, latency, or savings guarantees.
+Compare the same representative implementation, research, regression, and review tasks with
+identical tools and deterministic validation. Record actual model/provider and reasoning,
+uncached/cached input, reasoning/output tokens, retries, and latency in your cost tooling.
+Select on cost per correctly completed task. DeepSeek's cached input can be cheaper than Luna's,
+so lower uncached token rates alone do not establish lower total task cost. Do not infer model
+quality from tiny samples or compare benchmark scores obtained with different harnesses.
+Keep compact non-sensitive outcomes in the journal and raw cost telemetry outside it.
 
 ## Agents
 
@@ -161,11 +221,18 @@ python3 scripts/check-harness.py
 python3 scripts/eval-report.py
 ```
 
-`check-harness.py` validates agent frontmatter and mode, the model policy in `model-policy.json`,
+`check-harness.py` validates agent frontmatter and mode, model/reasoning settings and capability metadata in `model-policy.json`,
 skill frontmatter, `AGENTS.md` discoverability, required artifacts, the journal, and the Codeburn
 state file. `eval-report.py` validates the same journal and computes outcome/retry/escalation metrics.
 Both work in the source kit layout (`agents/`) and after installation (`.opencode/agents/`).
-Requires PyYAML.
+Requires PyYAML. From this source repository, also run:
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+The tests exercise all installation variants, profile switching, reasoning compatibility,
+project-state preservation, and policy drift. They do not make paid model requests.
 
 ## Repository layout
 
@@ -178,11 +245,13 @@ scripts/
   eval-report.py            journal metrics
   eval_schema.py            shared journal schema validation
   codeburn_state.py         Codeburn last-run tracking (check/mark)
-  apply-model-policy.py     rewrites agent models from a policy
+  apply-model-policy.py     applies models and provider-specific reasoning
+  model_policy.py           shared policy validation and frontmatter updates
   merge-agents-md.py        managed-block AGENTS.md merge
-model-policy.json           normal model mapping (source of truth)
-model-policy.cheap.json     cheap variant mapping
-model-policy.local.json     local variant mapping
+tests/test_model_policy.py  installer and policy regression tests
+model-policy.json           normal model/reasoning policy (source of truth)
+model-policy.cheap.json     cheap model/reasoning policy
+model-policy.local.json     local model policy; server-default reasoning
 .opencode-evals/            evaluation journal + Codeburn state
 docs/agent/                 agent knowledge map (built by bootstrap-project)
 docs/exec-plans/            durable active/completed plans

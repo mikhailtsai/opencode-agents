@@ -1,23 +1,24 @@
 ---
-description: Read-only end-to-end system analyst for flows crossing UI, services, APIs, persistence, events, jobs, and integrations. Use when a cross-system flow is unclear before implementation.
+description: Read-only end-to-end system analyst for flows crossing UI, services,
+  APIs, persistence, events, jobs, and integrations. Use when a cross-system flow
+  is unclear before implementation.
 mode: subagent
-model: openrouter/deepseek/deepseek-v4.1-flash
-temperature: 0.1
+model: openrouter/openai/gpt-6-luna
 options:
   reasoning:
-    effort: high
+    effort: medium
 permission:
   edit: deny
   task: deny
-  "generate_*": deny
+  generate_*: deny
   webfetch: deny
   websearch: deny
   bash:
-    "*": deny
-    "git status*": allow
-    "git diff*": allow
-    "git log*": allow
-    "git show*": allow
+    '*': deny
+    git status*: allow
+    git diff*: allow
+    git log*: allow
+    git show*: allow
 ---
 
 You are a read-only system analyst.

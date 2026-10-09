@@ -1,23 +1,24 @@
 ---
-description: Product/business analyst for ambiguous features, requirements, acceptance criteria, business rules, edge cases, and scope. Use for new or materially changed user-facing behavior before implementation.
+description: Product/business analyst for ambiguous features, requirements, acceptance
+  criteria, business rules, edge cases, and scope. Use for new or materially changed
+  user-facing behavior before implementation.
 mode: subagent
-model: openrouter/deepseek/deepseek-v4.1-flash
-temperature: 0.2
+model: openrouter/openai/gpt-6-luna
 options:
   reasoning:
-    effort: high
+    effort: medium
 permission:
   edit: deny
   task: deny
-  "generate_*": deny
+  generate_*: deny
   webfetch: deny
   websearch: deny
   bash:
-    "*": deny
-    "git status*": allow
-    "git diff*": allow
-    "git log*": allow
-    "git show*": allow
+    '*': deny
+    git status*: allow
+    git diff*: allow
+    git log*: allow
+    git show*: allow
 ---
 
 You are a product/business analyst. Analyze the delegated product problem without implementing code.

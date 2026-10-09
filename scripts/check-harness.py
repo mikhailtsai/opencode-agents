@@ -33,14 +33,15 @@ if not AGENTS_DIR.is_dir():
 
 errors = []
 
+from model_policy import agent_policy_errors, load_policy
+
 POLICY_PATH = ROOT / "model-policy.json"
-POLICY_AGENTS = {}
-if POLICY_PATH.is_file():
-    try:
-        POLICY_AGENTS = json.loads(POLICY_PATH.read_text(encoding="utf-8")).get("agents", {})
-    except (OSError, ValueError, AttributeError) as error:
-        errors.append(f"model-policy.json: invalid policy: {error}")
-        POLICY_AGENTS = {}
+POLICY = None
+try:
+    POLICY = load_policy(POLICY_PATH)
+except (OSError, ValueError) as error:
+    errors.append(f"model-policy.json: invalid policy: {error}")
+POLICY_AGENTS = POLICY["agents"] if POLICY else {}
 
 EXPECTED_AGENTS = {
     "product-analyst",
@@ -118,10 +119,14 @@ for path in agent_paths:
     elif model != expected:
         fail(f"{rel}: expected model {expected!r} from model-policy.json, got {model!r}")
 
-    effort = (data.get("options") or {}).get("reasoning", {})
-    effort = effort.get("effort") if isinstance(effort, dict) else None
-    if effort not in {"low", "medium", "high"}:
-        fail(f"{rel}: options.reasoning.effort must be low|medium|high, got {effort!r}")
+    if POLICY and path.stem in POLICY_AGENTS:
+        try:
+            errors.extend(f"{rel}: {error}" for error in agent_policy_errors(data, path.stem, POLICY))
+        except ValueError as error:
+            fail(f"{rel}: {error}")
+
+if POLICY and set(POLICY_AGENTS) != ALL_AGENTS:
+    fail("model-policy.json: policy must cover exactly all shipped agents")
 
 # --- Skills -----------------------------------------------------------------
 skill_paths = sorted((ROOT / ".opencode/skills").glob("*/SKILL.md"))
@@ -167,6 +172,7 @@ required_files = [
     "scripts/eval_schema.py",
     "scripts/codeburn_state.py",
     "scripts/apply-model-policy.py",
+    "scripts/model_policy.py",
     "scripts/merge-agents-md.py",
     "docs/agent/README.md",
 ]

@@ -13,5 +13,41 @@
     "security-reviewer": "llamacpp/qwen-orch-14b",
     "architect": "llamacpp/qwen-local",
     "oracle": "llamacpp/qwen-local"
+  },
+  "reasoning": {
+    "orchestrator": null,
+    "product-analyst": null,
+    "system-analyst": null,
+    "researcher": null,
+    "implementer": null,
+    "worker": null,
+    "test-engineer": null,
+    "reviewer": null,
+    "requirements-reviewer": null,
+    "security-reviewer": null,
+    "architect": null,
+    "oracle": null
+  },
+  "models": {
+    "llamacpp/qwen-orch-14b": {
+      "efforts": [],
+      "toggle": false,
+      "temperature": true
+    },
+    "llamacpp/gemma-orch-12b": {
+      "efforts": [],
+      "toggle": false,
+      "temperature": true
+    },
+    "llamacpp/nemotron": {
+      "efforts": [],
+      "toggle": false,
+      "temperature": true
+    },
+    "llamacpp/qwen-local": {
+      "efforts": [],
+      "toggle": false,
+      "temperature": true
+    }
   }
 }

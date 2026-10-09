@@ -2,16 +2,96 @@
   "variant": "normal",
   "agents": {
     "orchestrator": "openrouter/deepseek/deepseek-v4.1-flash",
-    "product-analyst": "openrouter/deepseek/deepseek-v4.1-flash",
-    "system-analyst": "openrouter/deepseek/deepseek-v4.1-flash",
-    "researcher": "openrouter/deepseek/deepseek-v4.1-flash",
+    "product-analyst": "openrouter/openai/gpt-6-luna",
+    "system-analyst": "openrouter/openai/gpt-6-luna",
+    "researcher": "openrouter/openai/gpt-6-luna",
     "implementer": "openrouter/deepseek/deepseek-v4.1-flash",
-    "worker": "openrouter/deepseek/deepseek-v4.1-flash",
+    "worker": "openrouter/openai/gpt-6-luna",
     "test-engineer": "openrouter/deepseek/deepseek-v4.1-flash",
-    "reviewer": "openrouter/deepseek/deepseek-v4.1-flash",
+    "reviewer": "openrouter/z-ai/glm-5.3-flash",
     "requirements-reviewer": "openrouter/deepseek/deepseek-v4.1-flash",
     "security-reviewer": "openrouter/deepseek/deepseek-v4.1-flash",
-    "architect": "openrouter/z-ai/glm-5.3-flash",
-    "oracle": "openrouter/z-ai/glm-5.3-flash"
+    "architect": "openrouter/openai/gpt-6.1-sol",
+    "oracle": "openrouter/openai/gpt-6.1-sol"
+  },
+  "reasoning": {
+    "orchestrator": {
+      "effort": "high"
+    },
+    "product-analyst": {
+      "effort": "medium"
+    },
+    "system-analyst": {
+      "effort": "medium"
+    },
+    "researcher": {
+      "effort": "medium"
+    },
+    "implementer": {
+      "effort": "high"
+    },
+    "worker": {
+      "effort": "low"
+    },
+    "test-engineer": {
+      "effort": "high"
+    },
+    "reviewer": {
+      "effort": "high"
+    },
+    "requirements-reviewer": {
+      "effort": "high"
+    },
+    "security-reviewer": {
+      "effort": "high"
+    },
+    "architect": {
+      "effort": "high"
+    },
+    "oracle": {
+      "effort": "xhigh"
+    }
+  },
+  "models": {
+    "openrouter/deepseek/deepseek-v4.1-flash": {
+      "efforts": [
+        "low",
+        "high",
+        "max"
+      ],
+      "toggle": true,
+      "temperature": true
+    },
+    "openrouter/openai/gpt-6-luna": {
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "toggle": false,
+      "temperature": false
+    },
+    "openrouter/z-ai/glm-5.3-flash": {
+      "efforts": [
+        "low",
+        "high",
+        "max"
+      ],
+      "toggle": false,
+      "temperature": true
+    },
+    "openrouter/openai/gpt-6.1-sol": {
+      "efforts": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "toggle": false,
+      "temperature": false
+    }
   }
 }

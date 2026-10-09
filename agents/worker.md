@@ -1,14 +1,15 @@
 ---
-description: "Fast execution agent for narrow mechanical tasks: targeted edits, searches, test runs, diagnostics, and straightforward fixes. Not for investigation or design work."
+description: 'Fast execution agent for narrow mechanical tasks: targeted edits, searches,
+  test runs, diagnostics, and straightforward fixes. Not for investigation or design
+  work.'
 mode: subagent
-model: openrouter/deepseek/deepseek-v4.1-flash
-temperature: 0.1
+model: openrouter/openai/gpt-6-luna
 options:
   reasoning:
-    effort: high
+    effort: low
 permission:
   task: deny
-  "generate_*": allow
+  generate_*: allow
   webfetch: deny
   websearch: deny
 ---

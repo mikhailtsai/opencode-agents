@@ -1,23 +1,23 @@
 ---
-description: Very rare final escalation for a high-impact reasoning blocker that remains unresolved after the architect escalation.
+description: Very rare final escalation for a high-impact reasoning blocker that remains
+  unresolved after the architect escalation.
 mode: subagent
-model: openrouter/z-ai/glm-5.3-flash
-temperature: 0.1
+model: openrouter/openai/gpt-6.1-sol
 options:
   reasoning:
-    effort: high
+    effort: xhigh
 permission:
   edit: deny
   task: deny
-  "generate_*": deny
+  generate_*: deny
   webfetch: deny
   websearch: deny
   bash:
-    "*": deny
-    "git status*": allow
-    "git diff*": allow
-    "git log*": allow
-    "git show*": allow
+    '*': deny
+    git status*: allow
+    git diff*: allow
+    git log*: allow
+    git show*: allow
 ---
 
 Act only as the last reasoning escalation. Do not perform routine work.

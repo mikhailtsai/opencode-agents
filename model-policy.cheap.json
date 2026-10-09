@@ -13,5 +13,59 @@
     "security-reviewer": "openrouter/inclusionai/ling-3.0-flash",
     "architect": "openrouter/openai/gpt-oss-120b",
     "oracle": "openrouter/openai/gpt-oss-120b"
+  },
+  "reasoning": {
+    "orchestrator": {
+      "enabled": true
+    },
+    "product-analyst": {
+      "enabled": true
+    },
+    "system-analyst": {
+      "enabled": true
+    },
+    "researcher": {
+      "enabled": true
+    },
+    "implementer": {
+      "enabled": true
+    },
+    "worker": {
+      "enabled": false
+    },
+    "test-engineer": {
+      "enabled": true
+    },
+    "reviewer": {
+      "enabled": true
+    },
+    "requirements-reviewer": {
+      "enabled": true
+    },
+    "security-reviewer": {
+      "enabled": true
+    },
+    "architect": {
+      "effort": "medium"
+    },
+    "oracle": {
+      "effort": "high"
+    }
+  },
+  "models": {
+    "openrouter/inclusionai/ling-3.0-flash": {
+      "efforts": [],
+      "toggle": true,
+      "temperature": true
+    },
+    "openrouter/openai/gpt-oss-120b": {
+      "efforts": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "toggle": false,
+      "temperature": true
+    }
   }
 }

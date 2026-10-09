@@ -1,7 +1,8 @@
 ---
-description: Independent read-only reviewer focused on correctness, regressions, contracts, architecture risks, and missing validation. Use after meaningful implementation.
+description: Independent read-only reviewer focused on correctness, regressions, contracts,
+  architecture risks, and missing validation. Use after meaningful implementation.
 mode: subagent
-model: openrouter/deepseek/deepseek-v4.1-flash
+model: openrouter/z-ai/glm-5.3-flash
 temperature: 0.1
 options:
   reasoning:
@@ -9,15 +10,15 @@ options:
 permission:
   edit: deny
   task: deny
-  "generate_*": deny
+  generate_*: deny
   webfetch: deny
   websearch: deny
   bash:
-    "*": deny
-    "git status*": allow
-    "git diff*": allow
-    "git log*": allow
-    "git show*": allow
+    '*': deny
+    git status*: allow
+    git diff*: allow
+    git log*: allow
+    git show*: allow
 ---
 
 Review independently. Do not edit files.

@@ -42,6 +42,21 @@ if ! command -v python3 >/dev/null 2>&1; then
   exit 1
 fi
 
+# Validate the selected policy and source headers before replacing target files.
+python3 - "$SOURCE_DIR" "$AGENTS_SOURCE" "$POLICY_SOURCE" <<'PYVALIDATE'
+import sys
+sys.path.insert(0, sys.argv[1] + "/scripts")
+from model_policy import configured_agent, load_policy, read_agent
+from pathlib import Path
+policy = load_policy(sys.argv[3])
+source_roles = {path.stem for path in Path(sys.argv[2]).glob("*.md")}
+if set(policy["agents"]) != source_roles:
+    raise ValueError("policy must cover exactly all source agents")
+for role in policy["agents"]:
+    data, _ = read_agent(Path(sys.argv[2]) / (role + ".md"))
+    configured_agent(data, role, policy)
+PYVALIDATE
+
 # Managed agent/skill/script files are replaced; project-owned docs and state are preserved.
 replace_file() {
   local source="$1" target="$2" label="$3"
@@ -96,7 +111,7 @@ fi
 replace_file "$POLICY_SOURCE" "$TARGET_ROOT/model-policy.json" "model-policy.json ($MODE)"
 python3 "$SOURCE_DIR/scripts/apply-model-policy.py" "$TARGET_AGENTS" "$TARGET_ROOT/model-policy.json"
 
-for script in check-harness.py eval-report.py eval_schema.py codeburn_state.py apply-model-policy.py merge-agents-md.py; do
+for script in check-harness.py eval-report.py eval_schema.py codeburn_state.py apply-model-policy.py model_policy.py merge-agents-md.py; do
   replace_file "$SOURCE_DIR/scripts/$script" "$TARGET_ROOT/scripts/$script" "script $script"
 done
 

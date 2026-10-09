@@ -5,7 +5,7 @@ description: Create an execution plan for complex or risky work using repository
 
 # Execution plan
 
-Use a lightweight in-context plan for small work. For complex/risky work create `docs/exec-plans/active/<slug>.md`.
+Use a lightweight in-context plan for small work. For complex/risky work keep a durable plan in a file and update it as facts change.
 
 A durable plan should contain only:
 - goal and acceptance criteria
@@ -20,4 +20,4 @@ Delegate product/system/code investigation to the default agents where useful. P
 Do not use the `architect` escalation unless default-agent findings expose a consequential unresolved architecture decision.
 Do not use the `oracle` escalation unless `architect` or repeated default-agent attempts still cannot resolve a high-impact blocker.
 
-Update the plan as facts change. Move completed durable plans to `docs/exec-plans/completed/`.
+Update the plan as facts change. Mark the plan complete or move it aside when the work is done.

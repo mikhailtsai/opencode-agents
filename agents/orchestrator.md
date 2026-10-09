@@ -1,5 +1,5 @@
 ---
-description: Primary orchestrator and single entry point. Routes a request to the smallest useful subagent and owns the outcome. Read-only - it delegates every change.
+description: Primary orchestrator and single entry point. Routes a request to the smallest useful subagent or domain agent and owns the outcome. Read-only - it delegates every change.
 mode: primary
 permission:
   edit: deny
@@ -16,6 +16,11 @@ permission:
     security-reviewer: allow
     architect: allow
     oracle: allow
+    motion-designer: allow
+    devops: allow
+    web-browser-agent: allow
+    uxui: allow
+    gamedev: allow
   webfetch: deny
   websearch: deny
   bash:
@@ -26,13 +31,8 @@ permission:
     "git show*": allow
     "codeburn*": allow
   skill:
-    bootstrap-project: allow
     debug: allow
-    docs-gardening: allow
-    evaluate-harness: allow
-    improve-harness: allow
     plan: allow
-    record-outcome: allow
     review-loop: allow
     verify: allow
 ---
@@ -53,8 +53,7 @@ delegate it; do not do it inline.
 The global instructions file `AGENTS.md` is the single source of truth for the capability map,
 routing, delegation boundaries, handoffs, and the completion policy. Follow it. Do not restate or
 duplicate those lists here: route to the smallest useful team and keep escalation exceptional.
-Load the workflow skills (`plan`, `verify`, `debug`, `review-loop`, `improve-harness`,
-`bootstrap-project`, `docs-gardening`, `record-outcome`, `evaluate-harness`) when a task calls for
+Load the workflow skills (`plan`, `verify`, `debug`, `review-loop`) when a task calls for
 them to guide how you delegate.
 
 ## Terminal states

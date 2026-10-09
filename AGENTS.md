@@ -26,7 +26,7 @@ Delegate instead:
 
 | Agent | Mode | Capabilities | When to use |
 |---|---|---|---|
-| `orchestrator` | primary | no MCP; skills: `bootstrap-project` `debug` `docs-gardening` `evaluate-harness` `improve-harness` `plan` `record-outcome` `review-loop` `verify` | route work, own the outcome |
+| `orchestrator` | primary | no MCP; skills: `debug` `plan` `review-loop` `verify` | route work, own the outcome |
 | `researcher` | subagent | `webfetch` + `websearch`; no MCP; no skills | repo investigation + external docs/APIs |
 | `product-analyst` | subagent | no web; no MCP; no skills | requirements, business rules, acceptance criteria, edge cases |
 | `system-analyst` | subagent | no web; no MCP; no skills | end-to-end flows, state/data, integrations, boundaries |
@@ -93,10 +93,3 @@ Do not spawn agents for tiny mechanical changes or work that cannot benefit from
 When the same failure recurs, do not grow this file. Improve the repository: tool, test, linter,
 structural check, observability, documentation, or discoverability. Prefer enforceable invariants
 over prompt rules. Keep this file a map, not a manual.
-
-## Evaluation / Codeburn
-
-Do not rely on agent self-confidence as evidence. Prefer deterministic checks, independent review,
-real user corrections, regressions, and accumulated outcomes. Improve recurring failure classes
-rather than reacting to isolated anecdotes. Never store prompts, secrets, source code, personal
-data, or raw telemetry in any outcome journal.

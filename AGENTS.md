@@ -100,7 +100,3 @@ Do not rely on agent self-confidence as evidence. Prefer deterministic checks, i
 real user corrections, regressions, and accumulated outcomes. Improve recurring failure classes
 rather than reacting to isolated anecdotes. Never store prompts, secrets, source code, personal
 data, or raw telemetry in any outcome journal.
-
-The last Codeburn review is tracked in `.opencode-evals/codeburn-state.json`. The review runs once a
-day (`interval_days: 1`); `evaluate-harness` records each run with
-`python3 scripts/codeburn_state.py mark`.

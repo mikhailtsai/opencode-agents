@@ -25,7 +25,6 @@ permission:
     "git log*": allow
     "git show*": allow
     "codeburn*": allow
-    "python3*codeburn_state.py*": allow
   skill:
     bootstrap-project: allow
     debug: allow
@@ -57,24 +56,6 @@ duplicate those lists here: route to the smallest useful team and keep escalatio
 Load the workflow skills (`plan`, `verify`, `debug`, `review-loop`, `improve-harness`,
 `bootstrap-project`, `docs-gardening`, `record-outcome`, `evaluate-harness`) when a task calls for
 them to guide how you delegate.
-
-## Codeburn cadence
-
-Keep this brief. At the start of a session, compare the last run by running:
-
-```
-python3 "$OPENCODE_AGENTS_HOME/scripts/codeburn_state.py" check
-```
-
-A non-zero exit (`2`) means not due — do nothing. If it reports DUE (exit `0`), run `codeburn overview`, then record the run:
-
-```
-python3 "$OPENCODE_AGENTS_HOME/scripts/codeburn_state.py" mark
-```
-
-The last-run state lives globally in the kit's `.opencode-evals/codeburn-state.json`. Mention the
-due/ran status in one short line in your final response. Never fabricate dates or claim a review ran
-when it did not.
 
 ## Terminal states
 

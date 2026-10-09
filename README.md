@@ -82,11 +82,6 @@ Then run `evaluate-harness` to correlate the two, find repeated failure classes,
 `improve-harness` for the smallest durable fix. Never store prompts, code, secrets, or raw telemetry
 in the journal.
 
-Last-review tracking: the orchestrator compares the last run at the start of a session and, when a
-review is due (daily, `interval_days: 1`), runs `codeburn overview` and records it. State lives in
-`.opencode-evals/codeburn-state.json`; use `scripts/codeburn_state.py check|mark` (exit 0 = due,
-2 = not due). Global agents find the script via `$OPENCODE_AGENTS_HOME`.
-
 ## Validation
 
 Run the local gate from the repository root:
@@ -97,7 +92,7 @@ python3 scripts/eval-report.py
 ```
 
 `check-harness.py` validates agent frontmatter and mode, skill frontmatter, `AGENTS.md`
-discoverability, required artifacts, the journal, and the Codeburn state file. `eval-report.py`
+discoverability, required artifacts, and the journal. `eval-report.py`
 validates the same journal and computes outcome/retry/escalation metrics. Both work in the source
 layout (`agents/`). Requires PyYAML.
 
@@ -110,8 +105,7 @@ scripts/
   check-harness.py          structural gate
   eval-report.py            journal metrics
   eval_schema.py            shared journal schema validation
-  codeburn_state.py         Codeburn last-run tracking (check/mark)
-.opencode-evals/            evaluation journal + Codeburn state
+.opencode-evals/            evaluation journal
 docs/agent/                 agent knowledge map (built by bootstrap-project)
 docs/exec-plans/            durable active/completed plans
 AGENTS.md                   routing and completion policy

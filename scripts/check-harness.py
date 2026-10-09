@@ -139,11 +139,9 @@ required_files = [
     "AGENTS.md",
     ".opencode-evals/README.md",
     ".opencode-evals/runs.jsonl",
-    ".opencode-evals/codeburn-state.json",
     "scripts/check-harness.py",
     "scripts/eval-report.py",
     "scripts/eval_schema.py",
-    "scripts/codeburn_state.py",
 ]
 for rel in required_files:
     if not (ROOT / rel).is_file():
@@ -173,24 +171,6 @@ if journal.is_file():
             fail(f".opencode-evals/runs.jsonl line {n}: invalid JSON: {e}")
             continue
         errors.extend(f".opencode-evals/runs.jsonl {error}" for error in validate_row(row, n, agents))
-
-# --- Codeburn cadence state -------------------------------------------------
-state_path = ROOT / ".opencode-evals/codeburn-state.json"
-if state_path.is_file():
-    try:
-        state = json.loads(state_path.read_text(encoding="utf-8"))
-    except Exception as e:
-        fail(f".opencode-evals/codeburn-state.json: invalid JSON: {e}")
-    else:
-        if not isinstance(state, dict):
-            fail(".opencode-evals/codeburn-state.json: must be a JSON object")
-        else:
-            last = state.get("last_run")
-            if last is not None and not isinstance(last, str):
-                fail(".opencode-evals/codeburn-state.json: last_run must be null or an ISO string")
-            interval = state.get("interval_days")
-            if type(interval) is not int or interval < 1:
-                fail(".opencode-evals/codeburn-state.json: interval_days must be a positive integer")
 
 if errors:
     print("Harness check FAILED")

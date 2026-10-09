@@ -23,8 +23,6 @@ tasks), NOT after every task. Per-task samples are too small to justify changes.
 6. Use `improve-harness` for an approved concrete improvement.
 7. Do not optimize metrics by weakening validation or avoiding difficult tasks.
 8. Do not infer model quality from tiny samples.
-9. Record that Codeburn ran: `python3 scripts/codeburn_state.py mark`. This updates
-   `.opencode-evals/codeburn-state.json` so the orchestrator can suggest the next review on time.
 
 Prefer the default model for this analysis. The `architect`/`oracle` escalations are unnecessary
 unless the analysis exposes an independently consequential architecture problem.

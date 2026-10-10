@@ -1,6 +1,9 @@
 ---
 description: Primary orchestrator and single entry point. Routes a request to the smallest useful subagent or domain agent and owns the outcome. Read-only - it delegates every change.
 mode: primary
+model: deepseek/deepseek-flash
+reasoningEffort: high
+top_p: 0.95
 permission:
   edit: deny
   task:
@@ -55,6 +58,13 @@ routing, delegation boundaries, handoffs, and the completion policy. Follow it. 
 duplicate those lists here: route to the smallest useful team and keep escalation exceptional.
 Load the workflow skills (`plan`, `verify`, `debug`, `review-loop`) when a task calls for
 them to guide how you delegate.
+
+## Cost discipline
+
+The main rule: prefer Flash agents by default. Call a Pro-tier agent (`reviewer`,
+`requirements-reviewer`, `security-reviewer`, `architect`, `oracle`) only when the task's risk or
+complexity genuinely requires it — never on every request. Escalate Pro further only per the
+routing rules in `AGENTS.md`.
 
 ## Terminal states
 

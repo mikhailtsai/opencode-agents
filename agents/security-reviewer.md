@@ -1,7 +1,9 @@
 ---
 description: On-demand security reviewer for auth, authorization, payments, secrets, untrusted input, data exposure, network boundaries, and sensitive integrations. Use only for security-sensitive changed surfaces.
 mode: subagent
-temperature: 0.1
+model: deepseek/deepseek-v4-pro
+reasoningEffort: high
+top_p: 0.95
 permission:
   edit: deny
   task: deny

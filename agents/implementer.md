@@ -1,7 +1,9 @@
 ---
 description: Focused coding agent for well-scoped multi-file implementation after requirements and context are understood. Use for every code, test, config, or documentation change.
 mode: subagent
-temperature: 0.2
+model: deepseek/deepseek-flash
+reasoningEffort: high
+top_p: 0.95
 permission:
   task: deny
   webfetch: deny

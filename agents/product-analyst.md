@@ -1,7 +1,9 @@
 ---
 description: Product/business analyst for ambiguous features, requirements, acceptance criteria, business rules, edge cases, and scope. Use for new or materially changed user-facing behavior before implementation.
 mode: subagent
-temperature: 0.2
+model: deepseek/deepseek-flash
+reasoningEffort: high
+top_p: 0.95
 permission:
   edit: deny
   task: deny

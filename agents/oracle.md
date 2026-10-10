@@ -1,7 +1,9 @@
 ---
 description: Very rare final escalation for a high-impact reasoning blocker that remains unresolved after the architect escalation.
 mode: subagent
-temperature: 0.1
+model: deepseek/deepseek-v4-pro
+reasoningEffort: max
+top_p: 0.95
 permission:
   edit: deny
   task: deny

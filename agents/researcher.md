@@ -1,7 +1,9 @@
 ---
 description: Read-only investigator. Use before implementation when repository context, execution paths, constraints, or root cause must be established, and for external documentation/API references via webfetch/websearch. Returns evidence-backed findings, never code changes.
 mode: subagent
-temperature: 0.1
+model: deepseek/deepseek-flash
+reasoningEffort: low
+top_p: 0.95
 permission:
   edit: deny
   task: deny
@@ -31,4 +33,5 @@ Return a compact research artifact to the parent containing:
 - validation ideas
 
 Separate verified findings from hypotheses. Do not guess. If evidence is insufficient, say exactly what remains unknown.
+If resolving the question requires a product or architecture decision, present the options and evidence and escalate rather than deciding for the parent.
 Do not spend tokens restating the task or generic best practices.

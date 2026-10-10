@@ -2,7 +2,8 @@
 
 Agents are installed globally (`~/.config/opencode/agent/`, skills in `~/.config/opencode/skills/`)
 and apply in every repository. The `orchestrator` is the primary, read-only router: it delegates
-every change and owns the outcome. Agents carry no hardcoded model; escalation is a role choice.
+every change and owns the outcome. Each agent is pinned to a DeepSeek model and reasoning effort
+(see the table).
 
 ## Orchestrator boundaries
 
@@ -24,25 +25,25 @@ Delegate instead:
 
 ## Team & capabilities
 
-| Agent | Mode | Capabilities | When to use |
-|---|---|---|---|
-| `orchestrator` | primary | no MCP; skills: `debug` `plan` `review-loop` `verify` | route work, own the outcome |
-| `researcher` | subagent | `webfetch` + `websearch`; no MCP; no skills | repo investigation + external docs/APIs |
-| `product-analyst` | subagent | no web; no MCP; no skills | requirements, business rules, acceptance criteria, edge cases |
-| `system-analyst` | subagent | no web; no MCP; no skills | end-to-end flows, state/data, integrations, boundaries |
-| `implementer` | subagent | no web; no MCP; no skills | bounded implementation |
-| `worker` | subagent | no web; no MCP; no skills | mechanical edits, commands, diagnostics, narrow fixes |
-| `test-engineer` | subagent | no web; no MCP; no skills | behavioral/regression tests and validation |
-| `reviewer` | subagent | no web; no MCP; no skills | correctness, regression, contracts, architecture review |
-| `requirements-reviewer` | subagent | no web; no MCP; no skills | acceptance against the original request |
-| `security-reviewer` | subagent | no web; no MCP; no skills | security-sensitive changed surfaces only |
-| `architect` | subagent | no web; no MCP; no skills | rare architecture escalation |
-| `oracle` | subagent | no web; no MCP; no skills | last-resort reasoning escalation |
-| `web-browser-agent` | all | MCP `browser_*`; no skills | interactive browser, logged-in pages, page captures |
-| `devops` | all | MCP `grafana_*`, `browser_*`; no skills | Grafana / observability / infra |
-| `motion-designer` | all | MCP `synthcut_*`, `remotion_*`, `browser_*`; skills: `video-shotcraft` `remotion-*` `motion-graphics` `cinematic-camera` `article-highlights` `terminal-inserts` `kinetic-reel` | video / motion graphics |
-| `uxui` | all | no web; no MCP; no skills (placeholder) | product / UX design |
-| `gamedev` | all | no web; no MCP; no skills (placeholder) | game development |
+| Agent | Mode | Capabilities | When to use | Model · effort |
+|---|---|---|---|---|
+| `orchestrator` | primary | no MCP; skills: `debug` `plan` `review-loop` `verify` | route work, own the outcome | deepseek/deepseek-flash · high |
+| `researcher` | subagent | `webfetch` + `websearch`; no MCP; no skills | repo investigation + external docs/APIs | deepseek/deepseek-flash · low |
+| `product-analyst` | subagent | no web; no MCP; no skills | requirements, business rules, acceptance criteria, edge cases | deepseek/deepseek-flash · high |
+| `system-analyst` | subagent | no web; no MCP; no skills | end-to-end flows, state/data, integrations, boundaries | deepseek/deepseek-flash · high |
+| `implementer` | subagent | no web; no MCP; no skills | bounded implementation | deepseek/deepseek-flash · high |
+| `worker` | subagent | no web; no MCP; no skills | mechanical edits, commands, diagnostics, narrow fixes | deepseek/deepseek-flash · low |
+| `test-engineer` | subagent | no web; no MCP; no skills | behavioral/regression tests and validation | deepseek/deepseek-flash · low |
+| `reviewer` | subagent | no web; no MCP; no skills | correctness, regression, contracts, architecture review | deepseek/deepseek-v4-pro · high |
+| `requirements-reviewer` | subagent | no web; no MCP; no skills | acceptance against the original request | deepseek/deepseek-v4-pro · high |
+| `security-reviewer` | subagent | no web; no MCP; no skills | security-sensitive changed surfaces only | deepseek/deepseek-v4-pro · high |
+| `architect` | subagent | no web; no MCP; no skills | rare architecture escalation | deepseek/deepseek-v4-pro · high |
+| `oracle` | subagent | no web; no MCP; no skills | last-resort reasoning escalation | deepseek/deepseek-v4-pro · max |
+| `web-browser-agent` | all | MCP `browser_*`; no skills | interactive browser, logged-in pages, page captures | deepseek/deepseek-flash · low |
+| `devops` | all | MCP `grafana_*`, `browser_*`; no skills | Grafana / observability / infra | deepseek/deepseek-flash · high |
+| `motion-designer` | all | MCP `synthcut_*`, `remotion_*`, `browser_*`; skills: `video-shotcraft` `remotion-*` `motion-graphics` `cinematic-camera` `article-highlights` `terminal-inserts` `kinetic-reel` | video / motion graphics | deepseek/deepseek-flash · high |
+| `uxui` | all | no web; no MCP; no skills (placeholder) | product / UX design | deepseek/deepseek-flash · high |
+| `gamedev` | all | no web; no MCP; no skills (placeholder) | game development | deepseek/deepseek-flash · high |
 
 Domain agents (`web-browser-agent`, `devops`, `motion-designer`, `uxui`, `gamedev`) are installed in
 the global OpenCode config; the orchestrator's task allow-list includes them.
@@ -50,6 +51,10 @@ the global OpenCode config; the orchestrator's task allow-list includes them.
 ## Routing
 
 Use the smallest team that gives high confidence. Never run every role mechanically.
+
+The main rule: prefer Flash agents by default. Invoke Pro-tier agents (`reviewer`,
+`requirements-reviewer`, `security-reviewer`, `architect`, `oracle`) only when the task's risk or
+complexity genuinely requires it — never on every request.
 
 - tiny/mechanical → direct work or `worker`
 - bug/failure → `researcher` when the root cause is unknown → `implementer` → `test-engineer`
@@ -60,6 +65,11 @@ Use the smallest team that gives high confidence. Never run every role mechanica
 - acceptance uncertainty → add `requirements-reviewer`
 - repeated failure or illegible environment → improve the repository, not the prompt
 - complex multi-step work → decompose into bounded slices before implementing
+- normal chain: `implementer` (Flash high) → `test-engineer` → `reviewer` (Pro high) only when the change is significant
+- simple/mechanical task → delegate straight to Flash (`worker`/`implementer`); no separate planning step
+- `implementer` fails twice → escalate to `architect` (Pro high)
+- debug dead-end (root cause still unknown after evidence-gathering) → escalate to `oracle` (Pro max)
+- run `reviewer` only after meaningful changes, not after every fix
 
 Parallelize independent investigation and reviews.
 

@@ -1,7 +1,9 @@
 ---
 description: Independent acceptance reviewer. Checks whether the delivered behavior actually satisfies the user's/product requirements and acceptance criteria.
 mode: subagent
-temperature: 0.1
+model: deepseek/deepseek-v4-pro
+reasoningEffort: high
+top_p: 0.95
 permission:
   edit: deny
   task: deny

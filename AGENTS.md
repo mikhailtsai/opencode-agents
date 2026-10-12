@@ -18,6 +18,7 @@ Delegate instead:
 | video / motion graphics | `motion-designer` |
 | product / UX design | `uxui` |
 | game development | `gamedev` |
+| Blender / 3D modeling, animation, rendering | `blender` |
 | code change | `implementer` / `worker` |
 | tests | `test-engineer` |
 | review | `reviewer` / `requirements-reviewer` / `security-reviewer` |
@@ -28,6 +29,7 @@ Delegate instead:
 | Agent | Mode | Capabilities | When to use | Model · effort |
 |---|---|---|---|---|
 | `orchestrator` | primary | no MCP; skills: `debug` `plan` `review-loop` `verify` | route work, own the outcome | deepseek/deepseek-flash · high |
+| `solo` | primary | full access: read/edit/bash/web/MCP/skills; no delegation | standalone do-everything agent that bypasses orchestration | deepseek/deepseek-flash · high |
 | `researcher` | subagent | `webfetch` + `websearch`; no MCP; no skills | repo investigation + external docs/APIs | deepseek/deepseek-flash · low |
 | `product-analyst` | subagent | no web; no MCP; no skills | requirements, business rules, acceptance criteria, edge cases | deepseek/deepseek-flash · high |
 | `system-analyst` | subagent | no web; no MCP; no skills | end-to-end flows, state/data, integrations, boundaries | deepseek/deepseek-flash · high |
@@ -43,9 +45,12 @@ Delegate instead:
 | `devops` | all | MCP `grafana_*`, `browser_*`; no skills | Grafana / observability / infra | deepseek/deepseek-flash · high |
 | `motion-designer` | all | MCP `synthcut_*`, `remotion_*`, `browser_*`; skills: `video-shotcraft` `remotion-*` `motion-graphics` `cinematic-camera` `article-highlights` `terminal-inserts` `kinetic-reel` | video / motion graphics | deepseek/deepseek-flash · high |
 | `uxui` | all | no web; no MCP; no skills (placeholder) | product / UX design | deepseek/deepseek-flash · high |
-| `gamedev` | all | no web; no MCP; no skills (placeholder) | game development | deepseek/deepseek-flash · high |
+| `gamedev` | all | no web; no MCP; skills: `ref2game` `studioigor` | game development: reference→playable 2D slice, idea→release pipeline | deepseek/deepseek-flash · high |
+| `blender` | all | MCP `blender_*`; no skills | Blender 3D modeling, animation, rendering, scene scripting | deepseek/deepseek-flash · high |
 
-Domain agents (`web-browser-agent`, `devops`, `motion-designer`, `uxui`, `gamedev`) are installed in
+`solo` is a standalone primary agent with full tool access; it does the work itself and is not part of the orchestrated routing team.
+
+Domain agents (`web-browser-agent`, `devops`, `motion-designer`, `uxui`, `gamedev`, `blender`) are installed in
 the global OpenCode config; the orchestrator's task allow-list includes them.
 
 ## Routing

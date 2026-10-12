@@ -24,6 +24,7 @@ permission:
     web-browser-agent: allow
     uxui: allow
     gamedev: allow
+    blender: allow
   webfetch: deny
   websearch: deny
   bash:

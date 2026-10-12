@@ -63,4 +63,4 @@ full routing and completion policy.
 
 Third-party skills are vendored under `~/.config/opencode/vendor/` (git clones) and registered through
 `skills.paths` in the global config. The `gamedev` agent uses `ref2game` (reference → playable 2D game
-slice) and `studioigor` (idea → release pipeline).
+slice) and `studioigor` (idea → release pipeline). The gamedev image-generation path runs through the local `codex` CLI (ref2game's built-in `codex` provider, model `gpt-image-2`); the skill uses its own `uv` venv at `vendor/ref2game/.venv` for Pillow/NumPy/SciPy. Local OpenCode adaptations to vendored skills are kept in `patches/`.

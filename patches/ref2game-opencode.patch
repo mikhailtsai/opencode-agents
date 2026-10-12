@@ -1,0 +1,142 @@
+diff --git a/claude/SKILL.md b/claude/SKILL.md
+index a5bed2d..0291c7f 100644
+--- a/claude/SKILL.md
++++ b/claude/SKILL.md
+@@ -13,6 +13,17 @@ There are two sources of truth:
+ 
+ This folder is self-contained: scripts, engine templates, references and Playwright.
+ 
++## OpenCode runtime
++
++- `<skill>` is this folder. Run project scripts from the project root; quote paths with spaces.
++- **Image generation is fixed to the local `codex` CLI** (see Step 0). No API keys, no provider plugins, no other image skills.
++- **Python.** The system `python3` is a NixOS build without pip and without Pillow/NumPy/SciPy. Use this skill's venv and put it first on PATH so `python3` resolves to it:
++  `export PATH="/home/leet/.config/opencode/vendor/ref2game/.venv/bin:$PATH"`
++  Run `setup.sh` and every `python3 <skill>/scripts/...` command with that PATH.
++- **Asking.** There is no `AskUserQuestion` widget: ask the user directly in chat, grouped, recommended option first.
++- **Subagents / critics.** There is no background-subagent tool: run the checks yourself, or spawn them with the `task` tool when available, and fold their results into your final message. You cannot send a message after the turn ends.
++- **Browser checks.** Chromium exists at `/run/current-system/sw/bin/chromium`; the skill's Playwright-based `render.mjs` / `livecheck.mjs` need Playwright + Chromium installed into `scripts/` (`cd <skill>/scripts && npm install && npx playwright install chromium`).
++
+ ## Principles
+ 
+ 1. **Ask, don't guess.**
+@@ -58,25 +69,18 @@ The references are background knowledge, not rules: the reference and the user d
+ ## Step 0: look, then ask once
+ 
+ Look at the reference first. For a video, run `study.py probe` and make one contact sheet. Then make one `AskUserQuestion` call:
+-- **Image generator** (always ask):
+-  - Codex built-in image_gen (the default when `codex` is on PATH);
+-  - an image API the user names (you research it and plug it in);
+-  - a local tool via a command template;
+-  - manual (you write the prompts and the user drops the images in).
++- **Image generator: fixed, never ask.** All art goes through `gen.py`'s built-in `codex` provider,
++  which drives the local `codex` CLI (ChatGPT built-in image_gen, model `gpt-image-2`). No API key, no
++  provider choice; `--model` is ignored because the built-in tool picks its own image model. Do not
++  route generation through other image skills or tools.
+ - **What game this becomes and who the player is,** when the picture doesn't make it obvious. Each option says what the player does in this picture.
+ - **Anything else you can't settle yourself.**
+ 
+ All art goes through `gen.py`, which drives Codex too. Don't route generation through other image skills.
+ 
+ After the answer:
+-1. Run `gen.py check`.
+-2. For an API, follow `references/generators.md`:
+-   - research the docs into `study/GENERATOR.md`;
+-   - write a plugin from `provider_template.py`;
+-   - `--dry-run` it;
+-   - **ask once for a budget**;
+-   - run the capability probe (`generators.md` (c)).
+-3. Otherwise make one probe generation.
++1. Run `gen.py check` (the `codex` provider should read `ready`).
++2. Make one probe generation with the `codex` provider.
+ 
+ ## Phase 1: setup and study
+ 
+diff --git a/claude/scripts/gen.py b/claude/scripts/gen.py
+index c0c3932..6ce1b3c 100644
+--- a/claude/scripts/gen.py
++++ b/claude/scripts/gen.py
+@@ -122,9 +122,10 @@ RAW_DIR, LOG_DIR, REQ_DIR, OLD_DIR, PLUGIN_DIR = "art/raw", "art/logs", "art/req
+ CONFIG_FILE = "ref2game.json"
+ UA = "ref2game-gen/1.0 (+python-urllib)"
+ 
+-CODEX_PREAMBLE = ("Use your built-in image_gen tool (not a CLI, script or API call) to generate ONE image, "
+-                  "then copy the generated PNG file into this workspace as {path} (create folders if needed). "
+-                  "Do not write any code or edit other files.")
++CODEX_PREAMBLE = ("Use your built-in image_gen tool (not a CLI, script or API call) to generate ONE image. "
++                  "If the tool returns a local file path, copy that PNG into this workspace as {path} "
++                  "(create folders if needed). If it does not return a file path, do NOT search the "
++                  "filesystem, do not copy any other file, and do not write code - just finish.")
+ STYLE_LABEL = ("style reference only: match its art style, rendering, palette and light; "
+                "do not copy its composition")
+ EXTRA_LABEL = "reference for this asset: use it as the ASSET text describes"
+@@ -973,6 +974,9 @@ def codex_generate(prompt, refs, size, transparent, model, out_raw, opts, dry_ru
+     os.makedirs(os.path.dirname(target) or ".", exist_ok=True)
+     t0 = time.time()
+     timeout = float(opts.get("timeout", 900))
++    home = os.environ.get("CODEX_HOME", os.path.expanduser("~/.codex"))
++    genroot = os.path.join(home, "generated_images")
++    before = set(glob.glob(os.path.join(genroot, "*", "*"))) if os.path.isdir(genroot) else set()
+     with open(log, "wb") as lf:
+         try:
+             p = subprocess.run(cmd, input=full.encode("utf-8"), stdout=lf, stderr=subprocess.STDOUT, timeout=timeout)
+@@ -981,21 +985,49 @@ def codex_generate(prompt, refs, size, transparent, model, out_raw, opts, dry_ru
+             raise GenError(f"codex timed out after {timeout:.0f}s (see {log}); raise generator.opts.codex.timeout")
+     text = open(log, encoding="utf-8", errors="replace").read()
+     sid = (re.search(r"session id:\s*([0-9a-f-]{8,})", text) or [None, None])[1]
+-    src = None
+-    if os.path.exists(target) and os.path.getmtime(target) >= t0 - 1:
+-        src = target
+-    else:
++
++    def _usable(p):
++        """A real generated image: non-empty, opens as an image, and not a byte-copy of a reference
++        (image_gen returns inline base64 with no path, so the agent sometimes copies a decoy or nothing)."""
++        try:
++            if not os.path.isfile(p) or os.path.getsize(p) < 128:
++                return False
++            blob = open(p, "rb").read()
++            for r in refs:
++                try:
++                    if blob == open(r, "rb").read():
++                        return False
++                except OSError:
++                    pass
++            with Image.open(io.BytesIO(blob)) as im:
++                im.verify()
++            return True
++        except Exception:
++            return False
++
++    # 1) authoritative: a NEW file under $CODEX_HOME/generated_images/ (where the built-in tool persists it)
++    after = set(glob.glob(os.path.join(genroot, "*", "*"))) if os.path.isdir(genroot) else set()
++    fresh = sorted((f for f in (after - before) if _usable(f)), key=os.path.getmtime)
++    src = fresh[-1] if fresh else None
++    # 2) a path the transcript mentions
++    if not src:
+         cands = [c for c in re.findall(r"(/[^\s'\"`]*generated_images/[^\s'\"`]+?\.(?:png|webp|jpg))", text)
+-                 if os.path.exists(c) and os.path.getmtime(c) >= t0 - 1]
+-        if not cands and sid:
+-            home = os.environ.get("CODEX_HOME", os.path.expanduser("~/.codex"))
+-            cands = sorted(glob.glob(os.path.join(home, "generated_images", sid, "*")), key=os.path.getmtime)
++                 if _usable(c)]
+         if cands:
+             src = cands[-1]
+-            say(f"codex did not copy the file; using {src}", name=opts["_name"])
++    # 3) the workspace target, only if it is a usable image and not a copy of a reference
++    if not src and os.path.exists(target) and _usable(target):
++        src = target
+     if not src:
++        if os.path.exists(target) and not _usable(target):
++            try:
++                os.remove(target)
++            except OSError:
++                pass
+         tail = "\n".join(text.strip().splitlines()[-12:])
+-        raise GenError(f"codex finished (exit {rc}) without an image; see {log}\n--- log tail ---\n{tail}")
++        raise GenError(f"codex finished (exit {rc}) without a usable image; see {log}\n--- log tail ---\n{tail}")
++    if src != target:
++        say(f"codex image recovered from {src}", name=opts["_name"])
+     data = open(src, "rb").read()
+     path = save_bytes(data, out_raw)
+     if src == target:

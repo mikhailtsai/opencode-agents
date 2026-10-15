@@ -154,27 +154,44 @@ MCP family and for the sensitive built-ins:
   `blender_*` — all denied by default.
 - Built-ins: `set_subagent_model`, `set_subagent_models`, `subagent`, `webfetch`, `websearch`, and
   `skill` — all denied by default.
+- Built-in browser: the `browser` action — the desktop-app browser catalog, including
+  `browser.preview` — denied by default. It works only when the session is open in the OpenCode
+  desktop app, which attaches the browser; otherwise calls fail with `[browser.disconnected]`.
 - `external_directory` is allowed for `/tmp/**`.
+
+Two browser families exist and are denied separately. The MCP `browser_*` family is the server
+`browser` (`npx -y open-browser-control`), which drives the user's own logged-in browser through an
+extension and a local bridge. The built-in `browser` action controls the browser attached by the
+OpenCode desktop app (tabs, navigation, snapshots, screenshots, traces, and `browser.preview`, which
+shows a file in the Review pane); a deny removes the whole built-in catalog and has no per-operation
+prompts (docs: https://opencode.ai/v2/docs/tools, `## Browser`). Only `web-crawler` opts into the MCP
+`browser_*` family (it drives the user's own browser); the built-in catalog is opted into by the
+agents listed in the opt-in table below.
 
 Each agent then **opts in** to what its role needs through the `permissions` list in its own
 frontmatter. A role that does not list a family keeps the global deny.
 
 Two behaviours differ from the previous setup: domain agents no longer have `webfetch`/`websearch`
-(`web-crawler` and `motion-designer` use `browser_*` instead; `devops-tsai` and `project-manager`
-have no browser access at all), and the global `skill: *` deny means a newly vendored skill is
-unreachable until it is explicitly allowed for an agent.
+(`web-crawler` uses both browser families instead; `devops-tsai` and `project-manager` have no browser
+access at all), and the global `skill: *` deny means a newly vendored skill is unreachable until it is
+explicitly allowed for an agent. The built-in `browser` catalog is available to nine agents —
+`orchestrator`, `build`, `researcher`, `implementer`, `worker`, `test-engineer`, `reviewer`,
+`web-crawler`, and `motion-designer` — while the MCP `browser_*` family (the user's own logged-in
+browser) is opted in by exactly one agent, `web-crawler`. Route any task needing the user's own
+logged-in browser through `web-crawler`; the other ten agents keep no browser of either kind.
 
-| Agent | MCP families allowed | Skills allowed |
+| Agent | Opt-in tools | Skills allowed |
 |---|---|---|
-| `orchestrator` | — | `debug`, `plan`, `review-loop`, `verify` |
-| `build` | `synthcut_*`, `remotion_*`, `grafana_*`, `browser_*`, `blender_*` | `video-shotcraft`, `remotion-*`, `motion-graphics`, `cinematic-camera`, `article-highlights`, `terminal-inserts`, `kinetic-reel`, `debug`, `plan`, `review-loop`, `verify` |
-| `researcher` | `browser_*` (has `webfetch`/`websearch`) | — |
-| `product-analyst`, `system-analyst`, `implementer`, `worker`, `test-engineer` | — | — |
-| `reviewer` | `browser_*` | — |
+| `orchestrator` | `browser` (built-in) | `debug`, `plan`, `review-loop`, `verify` |
+| `build` | `synthcut_*`, `remotion_*`, `grafana_*`, `browser` (built-in), `blender_*` | `video-shotcraft`, `remotion-*`, `motion-graphics`, `cinematic-camera`, `article-highlights`, `terminal-inserts`, `kinetic-reel`, `debug`, `plan`, `review-loop`, `verify` |
+| `researcher` | `browser` (built-in) (has `webfetch`/`websearch`) | — |
+| `product-analyst`, `system-analyst` | — | — |
+| `implementer`, `worker`, `test-engineer` | `browser` (built-in) | — |
+| `reviewer` | `browser` (built-in) | — |
 | `requirements-reviewer`, `security-reviewer`, `architect`, `oracle` | — | — |
-| `web-crawler` | `browser_*` | — |
+| `web-crawler` | `browser_*`, `browser` (built-in) | — |
 | `devops-tsai` | `grafana_*` | — |
-| `motion-designer` | `synthcut_*`, `remotion_*`, `browser_*` | `video-shotcraft`, `remotion-*`, `motion-graphics`, `cinematic-camera`, `article-highlights`, `terminal-inserts`, `kinetic-reel` |
+| `motion-designer` | `synthcut_*`, `remotion_*`, `browser` (built-in) | `video-shotcraft`, `remotion-*`, `motion-graphics`, `cinematic-camera`, `article-highlights`, `terminal-inserts`, `kinetic-reel` |
 | `uxui` | — | — |
 | `game-developer` | `blender_*` | `ref2game`, `studioigor` |
 | `project-manager` | `linear_*`, `gitlab_*` | — |

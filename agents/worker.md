@@ -12,6 +12,9 @@ permissions:
   - action: websearch
     resource: "*"
     effect: deny
+  - action: browser
+    resource: "*"
+    effect: allow
 ---
 
 You are a fast execution worker. Do exactly the delegated task and keep scope narrow.

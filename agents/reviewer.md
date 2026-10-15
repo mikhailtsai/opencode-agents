@@ -30,7 +30,7 @@ permissions:
   - action: shell
     resource: "git show*"
     effect: allow
-  - action: "browser_*"
+  - action: browser
     resource: "*"
     effect: allow
 ---
@@ -48,6 +48,6 @@ Prioritize:
 5. missing or inadequate tests/validation
 
 Avoid style-only comments unless they reveal a real maintenance or correctness problem.
-When the review depends on it, you may visually inspect a rendered artifact in a browser (MCP tools `browser_*`).
+When the review depends on it, you may visually inspect a rendered artifact in the built-in `browser` catalog (attached by the desktop app). The user's own browser (MCP `browser_*`) is not available to you; if a finding genuinely depends on it, report that back to the caller rather than delegating.
 For each finding, give concrete evidence with file/path/symbol and a practical correction.
 If there are no meaningful findings, say so explicitly. Do not invent issues to justify the review.

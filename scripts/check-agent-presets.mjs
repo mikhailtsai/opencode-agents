@@ -24,6 +24,12 @@
 //   7. config/opencode.json commands.subagents.template offers all four presets,
 //      asks the question in one call ("ОДНИМ вызовом") and names exactly the
 //      bulk tool `set_subagent_models`, which the plugin defines.
+//   8. the browser permission policy (fail-closed): config/opencode.json denies
+//      the built-in `browser` action and the `browser_*` MCP tools globally
+//      (exactly one deny rule each); exactly the agents listed in
+//      BROWSER_ALLOW_AGENTS carry the built-in-browser allow rule and exactly
+//      the agents in BROWSER_MCP_AGENTS opt in to `browser_*`; no other agent
+//      file may carry either rule, so a newly added agent inherits the deny.
 //
 // Exit code 0 = clean, 1 = violations (printed as a readable list).
 
@@ -78,6 +84,33 @@ const REQUIRED_PROVIDERS = {
 
 // The /subagents template must name the bulk preset tool, not the one-off.
 const REQUIRED_TOOL = "set_subagent_models"
+
+// --- browser permission policy ----------------------------------------------
+// The built-in browser tool (`browser`) is denied globally in config/opencode.json
+// and re-opened per agent by an explicit allow rule. These two lists are the
+// authoritative opt-in sets, written out on purpose: a newly added agent/*.md
+// that is not listed here must stay denied, and the check flags it if it ever
+// gains a browser rule. Keeping the lists explicit (rather than "every file
+// that happens to exist") is what makes the policy fail-closed.
+const BROWSER_ALLOW_AGENTS = [
+  "build",
+  "researcher",
+  "reviewer",
+  "web-crawler",
+  "motion-designer",
+  "orchestrator",
+  "implementer",
+  "worker",
+  "test-engineer",
+]
+// The single agent additionally opting into the `browser_*` MCP tools: the
+// user's own logged-in browser is exposed to exactly `web-crawler` and nobody
+// else, so every other agent file must stay without a `browser_*` rule.
+const BROWSER_MCP_AGENTS = ["web-crawler"]
+
+// The built-in-browser allow rule must appear as this contiguous block.
+const BROWSER_ALLOW_BLOCK_RE =
+  /^[ \t]*- action: browser\r?\n[ \t]*resource: "\*"\r?\n[ \t]*effect: allow[ \t]*$/m
 
 const ID_RE = /id:\s*"([a-z0-9-]+)"/
 const ENTRY_RE = /\{\s*agent:\s*"([a-z0-9-]+)",\s*providerID:\s*"([^"]+)",\s*model:\s*"([^"]+)",\s*variant:\s*"([^"]+)"\s*\}/
@@ -284,6 +317,50 @@ function frontmatterField(text, key) {
   return undefined
 }
 
+// Strip one layer of surrounding quotes from a scalar read out of the
+// frontmatter (e.g. `"browser_*"` -> `browser_*`, `"*"` -> `*`).
+function unquote(value) {
+  const match = value.match(/^"([^"]*)"$/) ?? value.match(/^'([^']*)'$/)
+  return match ? match[1] : value
+}
+
+// Parse the permission rules out of an agent file's leading `---` frontmatter
+// block. Each rule is a `- action:` line followed by its `resource:` and
+// `effect:` sibling lines; the action line number is kept so a violation can be
+// reported as `file:line`. `actionRaw` preserves the on-disk spelling so the
+// check can require the exact `browser` / `"browser_*"` forms.
+function parsePermissionRules(text) {
+  const lines = text.split(/\r?\n/)
+  const rules = []
+  if (lines[0]?.trim() !== "---") return rules
+  const end = lines.findIndex((line, index) => index > 0 && line.trim() === "---")
+  const limit = end === -1 ? lines.length : end
+
+  let current = null
+  for (let i = 1; i < limit; i++) {
+    const line = lines[i]
+    const action = line.match(/^\s*-\s*action:\s*(.*)$/)
+    if (action) {
+      current = { actionRaw: action[1].trim(), resource: undefined, resourceLine: undefined, effect: undefined, effectLine: undefined, actionLine: i + 1 }
+      rules.push(current)
+      continue
+    }
+    if (!current) continue
+    const resource = line.match(/^\s*resource:\s*(.*)$/)
+    if (resource) {
+      current.resource = unquote(resource[1].trim())
+      current.resourceLine = i + 1
+      continue
+    }
+    const effect = line.match(/^\s*effect:\s*(.*)$/)
+    if (effect) {
+      current.effect = unquote(effect[1].trim())
+      current.effectLine = i + 1
+    }
+  }
+  return rules
+}
+
 const expected = new Set()
 const primary = []
 const agentModels = new Map()
@@ -386,6 +463,116 @@ if (configError) {
   }
 }
 
+// --- frontmatter sanity + browser permission policy -------------------------
+
+// Every agent file must keep a parseable frontmatter block and a `model:` line.
+// (The "deepseek" parity check above only covers non-primary agents; primary
+// agents are included here.)
+const agentText = new Map()
+for (const file of agentFiles) {
+  const id = file.replace(/\.md$/, "")
+  const text = readFileSync(join(AGENTS_DIR, file), "utf8")
+  agentText.set(id, text)
+
+  const lines = text.split(/\r?\n/)
+  const opens = lines[0]?.trim() === "---"
+  const closes = opens && lines.findIndex((line, index) => index > 0 && line.trim() === "---") !== -1
+  if (!opens || !closes) {
+    fail(`agents/${file}: frontmatter is not a parseable \`---\` block`)
+    continue
+  }
+  if (frontmatterField(text, "model") === undefined) {
+    fail(`agents/${file}: frontmatter has no \`model:\` line`)
+  }
+}
+
+// Global deny rules live in config/opencode.json `permissions`: exactly one
+// `browser` rule and one `browser_*` rule, both resource "*" and effect "deny".
+if (!configError) {
+  const permissions = Array.isArray(config?.permissions) ? config.permissions : []
+  if (!Array.isArray(config?.permissions)) {
+    fail(`${CONFIG}: \`permissions\` is missing or not an array`)
+  }
+  for (const action of ["browser", "browser_*"]) {
+    const matches = permissions
+      .map((rule, index) => ({ rule, index }))
+      .filter(({ rule }) => rule?.action === action)
+    if (matches.length === 0) {
+      fail(`${CONFIG}: permissions[].action has no global deny rule for "${action}" (expected exactly one with resource "*" and effect "deny")`)
+      continue
+    }
+    if (matches.length > 1) {
+      fail(`${CONFIG}: permissions[].action has ${matches.length} rules for "${action}" (expected exactly one) at indexes ${matches.map(({ index }) => index).join(", ")}`)
+    }
+    for (const { rule, index } of matches) {
+      if (rule.resource !== "*" || rule.effect !== "deny") {
+        fail(`${CONFIG}: permissions[${index}] (action "${action}") must be resource "*" and effect "deny" to preserve the global deny (found resource ${JSON.stringify(rule.resource)}, effect ${JSON.stringify(rule.effect)})`)
+      }
+    }
+  }
+}
+
+// Per-agent opt-in: only the agents in BROWSER_ALLOW_AGENTS may carry a built-in
+// `browser` allow rule, and only those in BROWSER_MCP_AGENTS may carry a
+// `browser_*` MCP opt-in. Any rule elsewhere is a violation (fail-closed), and
+// every listed agent must carry its rule, so the sets stay exact.
+const BROWSER_ALLOW_SET = new Set(BROWSER_ALLOW_AGENTS)
+const BROWSER_MCP_SET = new Set(BROWSER_MCP_AGENTS)
+
+for (const [id, text] of agentText) {
+  const rules = parsePermissionRules(text)
+  const browserRules = rules.filter((rule) => unquote(rule.actionRaw) === "browser")
+  const mcpRules = rules.filter((rule) => unquote(rule.actionRaw) === "browser_*")
+
+  for (const rule of browserRules) {
+    if (!BROWSER_ALLOW_SET.has(id)) {
+      fail(`agents/${id}.md:${rule.actionLine}: has a \`browser\` permission rule, but agents/${id}.md may not use the built-in browser (only: ${BROWSER_ALLOW_AGENTS.join(", ")})`)
+    }
+  }
+  for (const rule of mcpRules) {
+    if (!BROWSER_MCP_SET.has(id)) {
+      fail(`agents/${id}.md:${rule.actionLine}: has a \`browser_*\` MCP opt-in rule, but agents/${id}.md may not use the browser MCP tools (only: ${BROWSER_MCP_AGENTS.join(", ")})`)
+    }
+  }
+
+  if (BROWSER_ALLOW_SET.has(id)) {
+    if (browserRules.length === 0) {
+      fail(`agents/${id}.md: missing the built-in-browser allow rule (expected exactly \`- action: browser\` / \`resource: "*"\` / \`effect: allow\`)`)
+    }
+    for (const rule of browserRules) {
+      if (rule.actionRaw !== "browser") {
+        fail(`agents/${id}.md:${rule.actionLine}: \`browser\` action must be written unquoted as \`action: browser\` (found \`action: ${rule.actionRaw}\`)`)
+      }
+      if (rule.resource !== "*") {
+        fail(`agents/${id}.md:${rule.resourceLine ?? rule.actionLine}: \`browser\` rule must use resource "*" (found ${rule.resource === undefined ? "missing" : `"${rule.resource}"`})`)
+      }
+      if (rule.effect !== "allow") {
+        fail(`agents/${id}.md:${rule.effectLine ?? rule.actionLine}: \`browser\` rule must use effect "allow" (found ${rule.effect ?? "missing"})`)
+      }
+    }
+    if (browserRules.length > 0 && !BROWSER_ALLOW_BLOCK_RE.test(text)) {
+      fail(`agents/${id}.md: the \`browser\` allow rule must be the contiguous block \`- action: browser\` / \`resource: "*"\` / \`effect: allow\``)
+    }
+  }
+
+  if (BROWSER_MCP_SET.has(id)) {
+    if (mcpRules.length === 0) {
+      fail(`agents/${id}.md: missing the \`browser_*\` MCP opt-in rule (expected exactly \`- action: "browser_*"\` / \`resource: "*"\` / \`effect: allow\`)`)
+    }
+    for (const rule of mcpRules) {
+      if (rule.actionRaw !== '"browser_*"') {
+        fail(`agents/${id}.md:${rule.actionLine}: \`browser_*\` opt-in must be written as \`- action: "browser_*"\` (found \`action: ${rule.actionRaw}\`)`)
+      }
+      if (rule.resource !== "*") {
+        fail(`agents/${id}.md:${rule.resourceLine ?? rule.actionLine}: \`browser_*\` rule must use resource "*" (found ${rule.resource === undefined ? "missing" : `"${rule.resource}"`})`)
+      }
+      if (rule.effect !== "allow") {
+        fail(`agents/${id}.md:${rule.effectLine ?? rule.actionLine}: \`browser_*\` rule must use effect "allow" (found ${rule.effect ?? "missing"})`)
+      }
+    }
+  }
+}
+
 // --- report -----------------------------------------------------------------
 
 if (violations.length > 0) {
@@ -411,3 +598,4 @@ console.log(
 )
 console.log(`  ${PLUGIN}: PRESET_IDS enum is exactly ${[...expectedEnum].join(", ")}; COMBOS has no duplicates and every value is self-consistent`)
 console.log(`  ${CONFIG}: all ${PRESET_IDS.length} preset ids offered, "${ONE_CALL_PHRASE}" present, tool is exactly "${REQUIRED_TOOL}" and defined by the plugin (${templateNote})`)
+console.log(`  browser policy: ${CONFIG} denies "browser" and "browser_*" globally (effect deny); agents allow the built-in browser: ${BROWSER_ALLOW_AGENTS.join(", ")}; only ${BROWSER_MCP_AGENTS.join(", ")} may use the MCP "browser_*" tools`)

@@ -30,7 +30,7 @@ permissions:
   - action: "grafana_*"
     resource: "*"
     effect: allow
-  - action: "browser_*"
+  - action: browser
     resource: "*"
     effect: allow
   - action: "blender_*"
@@ -78,7 +78,7 @@ You are Build: a single, self-sufficient generalist agent. You do the work yours
 
 ## Access
 
-You have full access: read, edit and write files; run shell commands; fetch and search the web; use every MCP tool (`browser_*`, `grafana_*`, `synthcut_*`, `remotion_*`, `blender_*`); and load any skill. Use whatever the task needs.
+You have full access: read, edit and write files; run shell commands; fetch and search the web; use the MCP tools `grafana_*`, `synthcut_*`, `remotion_*` and `blender_*`; use the built-in `browser` catalog (attached by the desktop app, including `browser.preview`); and load any skill. The user's own browser (MCP `browser_*`) is not available to you. Use whatever the task needs.
 
 ## Way of working
 

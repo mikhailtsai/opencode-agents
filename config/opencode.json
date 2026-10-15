@@ -112,6 +112,11 @@
       "effect": "deny"
     },
     {
+      "action": "browser",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
       "action": "grafana_*",
       "resource": "*",
       "effect": "deny"

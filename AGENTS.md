@@ -17,7 +17,7 @@ also deny `subagent` locally. Delegate instead:
 | Need | Delegate to |
 |---|---|
 | external docs / web search | `researcher` |
-| interactive browser, logged-in pages, page captures | `web-crawler` |
+| interactive browser, **the user's own logged-in browser**, logged-in pages, page captures | `web-crawler` |
 | Grafana / observability / infra (tsai.tech) | `devops-tsai` |
 | video / motion graphics | `motion-designer` |
 | product / UX design | `uxui` |
@@ -28,32 +28,39 @@ also deny `subagent` locally. Delegate instead:
 | review | `reviewer` / `requirements-reviewer` / `security-reviewer` |
 | architecture | `architect` / `oracle` |
 
+The built-in desktop-app `browser` (Code Mode namespace, incl. `browser.preview`) is available directly to the agents listed in the capability table below; only `web-crawler` reaches the user's own browser (MCP `browser_*`), so route any task needing it there.
+
 ## Team & capabilities
 
 | Agent | Mode | Capabilities | When to use | Model · effort |
 |---|---|---|---|---|
-| `orchestrator` | primary | no MCP; skills: `debug` `plan` `review-loop` `verify` | route work, own the outcome | deepseek/deepseek-flash · high |
-| `build` | primary | full access except `linear_*`/`gitlab_*`: read/edit/bash/web/MCP/skills; no delegation | standalone do-everything agent that bypasses orchestration | deepseek/deepseek-flash · high |
-| `researcher` | subagent | MCP `browser_*` + `webfetch`/`websearch`; no skills | repo investigation + external docs/APIs | deepseek/deepseek-flash · max |
+| `orchestrator` | primary | no MCP; built-in `browser` (desktop app); skills: `debug` `plan` `review-loop` `verify` | route work, own the outcome | deepseek/deepseek-flash · high |
+| `build` | primary | full access except `linear_*`/`gitlab_*` and the MCP `browser_*` family (built-in browser retained): read/edit/bash/web/MCP/skills; no delegation | standalone do-everything agent that bypasses orchestration | deepseek/deepseek-flash · high |
+| `researcher` | subagent | built-in `browser` + `webfetch`/`websearch`; no skills | repo investigation + external docs/APIs | deepseek/deepseek-flash · max |
 | `product-analyst` | subagent | no web; no MCP; no skills | requirements, business rules, acceptance criteria, edge cases | deepseek/deepseek-flash · max |
 | `system-analyst` | subagent | no web; no MCP; no skills | end-to-end flows, state/data, integrations, boundaries | deepseek/deepseek-flash · max |
-| `implementer` | subagent | no web; no MCP; no skills | bounded implementation | deepseek/deepseek-flash · high |
-| `worker` | subagent | no web; no MCP; no skills | mechanical edits, commands, diagnostics, narrow fixes | deepseek/deepseek-flash · low |
-| `test-engineer` | subagent | no web; no MCP; no skills | behavioral/regression tests and validation | deepseek/deepseek-flash · low |
-| `reviewer` | subagent | MCP `browser_*`; no web; no skills | correctness, regression, contracts, architecture review | deepseek/deepseek-flash · high |
+| `implementer` | subagent | built-in `browser`; no web; no MCP; no skills | bounded implementation | deepseek/deepseek-flash · high |
+| `worker` | subagent | built-in `browser`; no web; no MCP; no skills | mechanical edits, commands, diagnostics, narrow fixes | deepseek/deepseek-flash · low |
+| `test-engineer` | subagent | built-in `browser`; no web; no MCP; no skills | behavioral/regression tests and validation | deepseek/deepseek-flash · low |
+| `reviewer` | subagent | built-in `browser`; no web; no skills | correctness, regression, contracts, architecture review | deepseek/deepseek-flash · high |
 | `requirements-reviewer` | subagent | no web; no MCP; no skills | acceptance against the original request | deepseek/deepseek-flash · max |
 | `security-reviewer` | subagent | no web; no MCP; no skills | security-sensitive changed surfaces only | deepseek/deepseek-flash · max |
 | `architect` | subagent | no web; no MCP; no skills | rare architecture escalation | deepseek/deepseek-flash · max |
 | `oracle` | subagent | no web; no MCP; no skills | last-resort reasoning escalation | deepseek/deepseek-flash · max |
-| `web-crawler` | subagent | MCP `browser_*`; no skills | interactive browser, logged-in pages, page captures | deepseek/deepseek-flash · low |
+| `web-crawler` | subagent | MCP `browser_*` + built-in `browser`; no skills | interactive browser, logged-in pages, page captures | deepseek/deepseek-flash · low |
 | `devops-tsai` | subagent | MCP `grafana_*`; no browser; no skills | DevOps for tsai.tech: Grafana / observability / infra | deepseek/deepseek-flash · high |
-| `motion-designer` | subagent | MCP `synthcut_*`, `remotion_*`, `browser_*`; skills: `video-shotcraft` `remotion-*` `motion-graphics` `cinematic-camera` `article-highlights` `terminal-inserts` `kinetic-reel` | video / motion graphics | deepseek/deepseek-flash · high |
+| `motion-designer` | subagent | MCP `synthcut_*`, `remotion_*` + built-in `browser`; skills: `video-shotcraft` `remotion-*` `motion-graphics` `cinematic-camera` `article-highlights` `terminal-inserts` `kinetic-reel` | video / motion graphics | deepseek/deepseek-flash · high |
 | `uxui` | subagent | no web; no MCP; no skills (placeholder) | product / UX design | deepseek/deepseek-flash · high |
 | `game-developer` | subagent | MCP `blender_*`; no browser; skills: `ref2game` `studioigor` | game development, Blender / 3D modeling, animation, rendering, scene scripting | deepseek/deepseek-flash · high |
 | `project-manager` | subagent | MCP `linear_*`, `gitlab_*`; no browser; no skills | task tracking: read issues/comments/attachments, move to In Progress, link MRs | deepseek/deepseek-flash · low |
 
-Browser access (`browser_*`) exists only for `researcher`, `reviewer`, `web-crawler`,
-`motion-designer`, and `build` (the full-access primary).
+The user's own browser (MCP `browser_*`, the `browser` MCP server driving the logged-in
+browser profile) is available **only** to `web-crawler`; every other agent keeps the global deny. The
+built-in desktop-app `browser` catalog (including `browser.preview`) is available to `web-crawler`
+plus `orchestrator`, `build`, `researcher`, `reviewer`, `motion-designer`, `implementer`, `worker`,
+and `test-engineer`, and is denied to every other agent. Anything needing the user's own browser
+(logged-in pages, cookies/profile, a real signed-in surface) is routed through `web-crawler`; an
+agent that cannot delegate must report that need back to its caller.
 
 `build` is a standalone primary agent with full tool access apart from the Linear and GitLab MCP
 families, which only `project-manager` may use; it does the work itself and is not part of the

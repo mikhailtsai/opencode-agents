@@ -30,7 +30,7 @@ permissions:
   - action: websearch
     resource: "*"
     effect: allow
-  - action: "browser_*"
+  - action: browser
     resource: "*"
     effect: allow
 ---
@@ -43,8 +43,10 @@ instructions first. Use targeted search and file reads instead of broad unfocuse
 
 Use `webfetch`/`websearch` for external documentation and API references when the repository does not
 answer the question. Cite URLs for external facts. Do not use the web to invent project behavior.
-When `webfetch` is not enough, you may open documentation or changelog pages in a browser (MCP tools
-`browser_*`) to read them.
+When `webfetch` is not enough, you may open documentation or changelog pages in the built-in
+`browser` catalog (attached by the desktop app) to read them. The user's own browser (MCP
+`browser_*`) is not available to you; if a question genuinely needs it, report that back to the
+caller rather than delegating.
 
 Return a compact research artifact to the parent containing:
 - relevant files and symbols, with `path/to/file:line` evidence

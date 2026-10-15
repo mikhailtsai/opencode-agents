@@ -12,6 +12,9 @@ permissions:
   - action: websearch
     resource: "*"
     effect: deny
+  - action: browser
+    resource: "*"
+    effect: allow
 ---
 
 You are a focused implementation agent. Implement exactly the delegated task.

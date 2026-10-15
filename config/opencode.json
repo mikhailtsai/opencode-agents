@@ -1,0 +1,247 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "orchestrator",
+  "instructions": [
+    "/home/leet/.config/opencode/AGENTS.md"
+  ],
+  "skills": [
+    "/home/leet/.config/opencode/vendor/video-shotcraft",
+    "/home/leet/.config/opencode/vendor/remotion-dev-skills/skills",
+    "/home/leet/.config/opencode/vendor/liam-remotion-skills/skills",
+    "/home/leet/.config/opencode/vendor/motion-tools-and-skills/skills/kinetic-reel",
+    "/home/leet/.config/opencode/vendor/ref2game/claude",
+    "/home/leet/.config/opencode/vendor/studioigor-skill"
+  ],
+  "tool_output": {
+    "max_bytes": 15000
+  },
+  "compaction": {
+    "auto": true,
+    "keep": {
+      "tokens": 6000
+    },
+    "buffer": 20000
+  },
+  "mcp": {
+    "servers": {
+      "browser": {
+        "type": "local",
+        "command": [
+          "npx",
+          "-y",
+          "open-browser-control"
+        ]
+      },
+      "grafana": {
+        "type": "remote",
+        "url": "https://mcp-grafana.tsai.tech/mcp",
+        "headers": {
+          "Authorization": "Bearer {file:/home/leet/.config/opencode/secrets/grafana-bearer}",
+          "X-Grafana-Service-Account-Token": "{file:/home/leet/.config/opencode/secrets/grafana-sa-token}"
+        }
+      },
+      "synthcut": {
+        "type": "local",
+        "command": [
+          "/run/current-system/sw/bin/synthcut-mcp"
+        ]
+      },
+      "remotion": {
+        "type": "local",
+        "command": [
+          "/run/current-system/sw/bin/remotion-mcp"
+        ]
+      },
+      "blender": {
+        "type": "local",
+        "command": [
+          "/run/current-system/sw/bin/uv",
+          "--directory",
+          "/home/leet/.config/opencode/vendor/blender_mcp/mcp",
+          "run",
+          "blender-mcp"
+        ],
+        "environment": {
+          "BLENDER_MCP_HOST": "localhost",
+          "BLENDER_MCP_PORT": "9876",
+          "BLENDER_PATH": "/run/current-system/sw/bin/blender"
+        }
+      },
+      "linear": {
+        "type": "remote",
+        "url": "https://mcp.linear.app/mcp"
+      },
+      "gitlab": {
+        "type": "local",
+        "command": [
+          "npx",
+          "-y",
+          "@zereight/mcp-gitlab"
+        ],
+        "environment": {
+          "GITLAB_API_URL": "https://gitlab.com/api/v4",
+          "GITLAB_PERSONAL_ACCESS_TOKEN": "{file:~/.config/opencode/gitlab.token}",
+          "GITLAB_PERMISSION_MODE": "full"
+        }
+      }
+    }
+  },
+  "plugins": [
+    "@slkiser/opencode-quota@5.0.2",
+    "@openchamber/opencode-claude@1.4.1"
+  ],
+  "permissions": [
+    {
+      "action": "external_directory",
+      "resource": "/tmp/**",
+      "effect": "allow"
+    },
+    {
+      "action": "linear_*",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "gitlab_*",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "browser_*",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "grafana_*",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "synthcut_*",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "remotion_*",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "blender_*",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "set_subagent_model",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "subagent",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "webfetch",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "websearch",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "skill",
+      "resource": "*",
+      "effect": "deny"
+    }
+  ],
+  "agents": {
+    "build": {
+      "disabled": true
+    },
+    "plan": {
+      "disabled": true
+    }
+  },
+  "providers": {
+    "copilot": {},
+    "openai": {},
+    "openrouter": {},
+    "opencode-go": {},
+    "deepseek": {
+      "models": {
+        "deepseek-flash": {
+          "body": {
+            "top_p": 0.95
+          },
+          "variants": [
+            {
+              "id": "high",
+              "settings": {
+                "reasoningEffort": "high"
+              }
+            },
+            {
+              "id": "low",
+              "settings": {
+                "reasoningEffort": "low"
+              }
+            },
+            {
+              "id": "max",
+              "settings": {
+                "reasoningEffort": "max"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "claude-code": {
+      "name": "Claude Code"
+    },
+    "moonshotai": {
+      "name": "Moonshot AI / Kimi",
+      "models": {
+        "kimi-k2.6": {
+          "name": "Kimi K2.6",
+          "limit": {
+            "context": 262144,
+            "output": 262144
+          }
+        },
+        "kimi-k2.7-code": {
+          "name": "Kimi K2.7 Code"
+        },
+        "kimi-k2.7-code-highspeed": {
+          "name": "Kimi K2.7 Code Highspeed"
+        },
+        "kimi-k2-thinking": {
+          "name": "Kimi K2 Thinking"
+        },
+        "kimi-k2.5": {
+          "name": "Kimi K2.5"
+        },
+        "kimi-k2-instruct": {
+          "name": "Kimi K2 Instruct"
+        },
+        "kimi-k3": {
+          "name": "Kimi K3"
+        }
+      },
+      "package": "aisdk:@ai-sdk/openai-compatible",
+      "settings": {
+        "baseURL": "https://api.moonshot.ai/v1",
+        "apiKey": "{env:MOONSHOT_API_KEY}"
+      }
+    }
+  },
+  "commands": {
+    "subagents": {
+      "description": "Настроить модель и effort для субагентов",
+      "template": "Спроси пользователя, какую модель и effort использовать для субагентов.\n\nЗадай все вопросы ОДНИМ вызовом инструмента question. Для каждого субагента — один вопрос: header это имя агента, в вариантах — пары модель+effort из списка ниже, плюс вариант \"без переопределения\".\n\nСписок пар (значение слева от тире — то, что нужно передать в инструмент):\n- deepseek/deepseek-flash#low — DeepSeek Flash · low\n- deepseek/deepseek-flash#high — DeepSeek Flash · high\n- deepseek/deepseek-flash#max — DeepSeek Flash · max\n- openrouter/xiaomi/mimo-v2.6-pro#none — MiMo 2.6 Pro · none\n- openrouter/xiaomi/mimo-v2.6-pro#thinking — MiMo 2.6 Pro · thinking\n- openai/gpt-6-luna#low — GPT 6 Luna · low\n- openai/gpt-6-luna#high — GPT 6 Luna · high\n- openai/gpt-6-luna#max — GPT 6 Luna · max\n\nСпроси про этих субагентов: worker, implementer, researcher, test-engineer, reviewer.\n\nПосле ответов вызови инструмент set_subagent_model по одному разу на каждого субагента: combo=<выбранное значение>, либо clear=true, если выбран вариант \"без переопределения\".\n\nЗатем ответь одной строкой со списком итоговых переопределений. Больше ничего не делай."
+    }
+  }
+}

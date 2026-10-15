@@ -24,6 +24,12 @@ permissions:
   - action: shell
     resource: "git show*"
     effect: allow
+  - action: webfetch
+    resource: "*"
+    effect: allow
+  - action: websearch
+    resource: "*"
+    effect: allow
 ---
 
 You are a read-only researcher. Investigate exactly the delegated question, in the repository and in

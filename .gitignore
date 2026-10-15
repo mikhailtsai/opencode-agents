@@ -1,3 +1,8 @@
 __pycache__/
 *.py[cod]
 .idea/
+secrets/
+*.token
+agent-models.json
+backups/
+node_modules/

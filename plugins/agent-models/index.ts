@@ -1,5 +1,5 @@
 import { Plugin } from "@opencode/plugin"
-import { readFile, writeFile } from "node:fs/promises"
+import { readFile, rename, rm, writeFile } from "node:fs/promises"
 
 // Per-subagent model + effort overrides. Re-read on every subagent launch, so
 // edits apply immediately without restarting OpenCode. Written by the
@@ -22,6 +22,31 @@ async function loadOverrides(): Promise<Record<string, unknown>> {
     return JSON.parse(await readFile(OVERRIDES_FILE, "utf8"))
   } catch {
     return {}
+  }
+}
+
+// Serialize the whole load → mutate → write critical section. Every call comes
+// from this process, so a module-level promise chain is enough to stop
+// concurrent set_subagent_model calls from clobbering each other's updates.
+let writeQueue: Promise<unknown> = Promise.resolve()
+function serialize<T>(fn: () => Promise<T>): Promise<T> {
+  const result = writeQueue.then(fn, fn)
+  writeQueue = result.then(() => undefined, () => undefined)
+  return result
+}
+
+// Write via a temp file in the same directory + rename, so the prompt hook's
+// concurrent loadOverrides() never reads a truncated file.
+async function saveOverrides(overrides: Record<string, unknown>): Promise<void> {
+  const tmp = `${OVERRIDES_FILE}.tmp-${process.pid}`
+  try {
+    await writeFile(tmp, JSON.stringify(overrides, null, 2) + "\n")
+    await rename(tmp, OVERRIDES_FILE)
+  } finally {
+    // The rename removes tmp on success; if we crashed before it, clean up the
+    // leftover. force ignores a missing file, and cleanup errors never mask the
+    // original failure.
+    await rm(tmp, { force: true }).catch(() => {})
   }
 }
 
@@ -58,16 +83,18 @@ export default Plugin.define({
           additionalProperties: false,
         },
         execute: async (input: any) => {
-          const overrides = await loadOverrides()
-          if (input.clear) {
-            delete overrides[input.agent]
-          } else {
-            const combo = COMBOS.find((c) => c.value === input.combo)
-            if (!combo) return { content: `unknown combo: ${input.combo}` }
-            overrides[input.agent] = { providerID: combo.providerID, model: combo.model, variant: combo.variant }
-          }
-          await writeFile(OVERRIDES_FILE, JSON.stringify(overrides, null, 2) + "\n")
-          return { content: JSON.stringify(overrides) }
+          return serialize(async () => {
+            const overrides = await loadOverrides()
+            if (input.clear) {
+              delete overrides[input.agent]
+            } else {
+              const combo = COMBOS.find((c) => c.value === input.combo)
+              if (!combo) return { content: `unknown combo: ${input.combo}` }
+              overrides[input.agent] = { providerID: combo.providerID, model: combo.model, variant: combo.variant }
+            }
+            await saveOverrides(overrides)
+            return { content: JSON.stringify(overrides) }
+          })
         },
       })
     })

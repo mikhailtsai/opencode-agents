@@ -1,14 +1,17 @@
 # Agent workflow
 
 Agents are installed globally (`~/.config/opencode/agent/`, skills in `~/.config/opencode/skills/`)
-and apply in every repository. The `orchestrator` is the primary, read-only router: it delegates
-every change and owns the outcome. Each agent is pinned to a DeepSeek model and reasoning effort
-(see the table).
+and apply in every repository. This repository is the single source of truth: `scripts/install.sh`
+symlinks everything into `~/.config/opencode/`, so the repo is edited, never the installed copies.
+The `orchestrator` is the primary, read-only router: it delegates every change and owns the outcome.
+Each agent is pinned to a DeepSeek model and reasoning effort (see the table).
 
 ## Orchestrator boundaries
 
 You (orchestrator) cannot `edit`, `webfetch`, `websearch`, or use MCP tools. Never attempt them.
-Delegate instead:
+You are also the only agent permitted to spawn subagents (`subagent`) and to set subagent models
+(`set_subagent_model`) — both are denied by the global rules, and most agents also deny `subagent`
+locally. Delegate instead:
 
 | Need | Delegate to |
 |---|---|
@@ -30,7 +33,7 @@ Delegate instead:
 | Agent | Mode | Capabilities | When to use | Model · effort |
 |---|---|---|---|---|
 | `orchestrator` | primary | no MCP; skills: `debug` `plan` `review-loop` `verify` | route work, own the outcome | deepseek/deepseek-flash · high |
-| `solo` | primary | full access: read/edit/bash/web/MCP/skills; no delegation | standalone do-everything agent that bypasses orchestration | deepseek/deepseek-flash · high |
+| `solo` | primary | full access except `linear_*`/`gitlab_*`: read/edit/bash/web/MCP/skills; no delegation | standalone do-everything agent that bypasses orchestration | deepseek/deepseek-flash · high |
 | `researcher` | subagent | `webfetch` + `websearch`; no MCP; no skills | repo investigation + external docs/APIs | deepseek/deepseek-flash · low |
 | `product-analyst` | subagent | no web; no MCP; no skills | requirements, business rules, acceptance criteria, edge cases | deepseek/deepseek-flash · high |
 | `system-analyst` | subagent | no web; no MCP; no skills | end-to-end flows, state/data, integrations, boundaries | deepseek/deepseek-flash · high |
@@ -50,10 +53,16 @@ Delegate instead:
 | `blender` | all | MCP `blender_*`; no skills | Blender 3D modeling, animation, rendering, scene scripting | deepseek/deepseek-flash · high |
 | `project-manager` | all | MCP `linear_*`, `gitlab_*`, `browser_*`; no skills | task tracking: read issues/comments/attachments, move to In Progress, link MRs | deepseek/deepseek-flash · high |
 
-`solo` is a standalone primary agent with full tool access; it does the work itself and is not part of the orchestrated routing team.
+`solo` is a standalone primary agent with full tool access apart from the Linear and GitLab MCP
+families, which only `project-manager` may use; it does the work itself and is not part of the
+orchestrated routing team.
 
-Domain agents (`web-browser-agent`, `devops`, `motion-designer`, `uxui`, `gamedev`, `blender`, `project-manager`) are installed in
-the global OpenCode config; the orchestrator's task allow-list includes them.
+Domain agents (`web-browser-agent`, `devops`, `motion-designer`, `uxui`, `gamedev`, `blender`, `project-manager`) are repo agent
+files (`agents/*.md`) like the core agents — not inline JSON — and `scripts/install.sh` installs them into the global
+`~/.config/opencode/agent/`; the orchestrator's task allow-list includes them.
+
+`project-manager` is the only agent permitted to use the Linear (`linear_*`) and GitLab (`gitlab_*`) tools. Route every
+task/issue-tracking and MR-linking request through it; no other agent may call those MCP families.
 
 ## Routing
 
@@ -73,9 +82,9 @@ complexity genuinely requires it — never on every request.
 - acceptance uncertainty → add `requirements-reviewer`
 - repeated failure or illegible environment → improve the repository, not the prompt
 - complex multi-step work → decompose into bounded slices before implementing
-- normal chain: `implementer` (Flash high) → `test-engineer` → `reviewer` (Pro high) only when the change is significant
+- normal chain: `implementer` (Flash high) → `test-engineer` → `reviewer` (max) only when the change is significant
 - simple/mechanical task → delegate straight to Flash (`worker`/`implementer`); no separate planning step
-- `implementer` fails twice → escalate to `architect` (Pro high)
+- `implementer` fails twice → escalate to `architect` (max)
 - debug dead-end (root cause still unknown after evidence-gathering) → escalate to `oracle` (Pro max)
 - run `reviewer` only after meaningful changes, not after every fix
 

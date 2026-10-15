@@ -99,6 +99,9 @@ permissions:
   - action: skill
     resource: "verify"
     effect: allow
+  - action: set_subagent_model
+    resource: "*"
+    effect: allow
 ---
 
 You are the primary software-development orchestrator: a read-only router and the single entry

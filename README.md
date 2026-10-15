@@ -1,9 +1,9 @@
 # OpenCode Agents
 
 A globally-installed multi-agent workflow for [OpenCode](https://opencode.ai), pinned to direct
-DeepSeek models. Agents run on `deepseek/deepseek-flash` (fast) or `deepseek/deepseek-v4-pro`
-(escalation) with a per-role reasoning effort (`low`/`high`/`max`), and carry only the tools,
-skills, and permissions their role needs.
+DeepSeek models. Agents run on `deepseek/deepseek-flash` with a per-role reasoning effort
+(`low`/`high`/`max`) — `#max` is the escalation tier — and carry only the tools, skills, and
+permissions their role needs.
 
 ## Install (global)
 
@@ -11,12 +11,36 @@ Agents and skills are installed globally so they are available in every reposito
 
 - Core agents → `~/.config/opencode/agent/` (copy `agents/*.md`)
 - Skills → `~/.config/opencode/skills/` (copy `.opencode/skills/*`)
+- Plugin → `~/.config/opencode/plugins/agent-models/` (copy `plugins/agent-models/index.ts`)
 
 The seven domain agents (`web-browser-agent`, `devops`, `motion-designer`, `uxui`, `gamedev`, `blender`, `project-manager`) are
 defined inline in `~/.config/opencode/opencode.json` under `agent`, not as files, because they bind
 the MCP servers and skill paths declared in that same file. They are not part of this repository.
 
-Restart OpenCode after changing any of these files: config is loaded once at startup.
+Restart OpenCode after changing agent files or the JSON config: on Linux the file-watcher backend is
+unavailable, so an already-used directory does not pick up edits. The exception is the per-subagent
+model overrides below, which are re-read on every subagent launch and apply immediately.
+
+## Per-subagent model overrides
+
+`plugins/agent-models/` is a plugin that lets you run chosen subagents on a different model and
+reasoning effort without touching their definitions. It reads
+`~/.config/opencode/agent-models.json` on every subagent launch and switches that subagent's model
+for the session, so edits apply immediately — no restart.
+
+```json
+{
+  "worker":      { "providerID": "openrouter", "model": "xiaomi/mimo-v2.6-pro", "variant": "none" },
+  "implementer": { "providerID": "openrouter", "model": "xiaomi/mimo-v2.6-pro", "variant": "thinking" },
+  "researcher":  { "providerID": "openai",     "model": "gpt-6-luna",        "variant": "high" }
+}
+```
+
+An empty object (`{}`) overrides nothing. The `variant` is the model's own effort/variant name, so it
+must exist for the target model (`openrouter/xiaomi/mimo-v2.6-pro` has `none`/`thinking`;
+`openai/gpt-6-luna` has `none`/`low`/`medium`/`high`/`xhigh`/`max`; `deepseek/deepseek-flash` has
+`high`/`low`/`max` defined in the global config). Only subagent (child) sessions are affected; the
+primary agent keeps whatever model the session selected.
 
 ## Agents
 
@@ -32,11 +56,11 @@ Core agents (source of truth: `agents/*.md`):
 | `implementer` | bounded implementation | deepseek/deepseek-flash · high |
 | `worker` | mechanical edits, commands, diagnostics, narrow fixes | deepseek/deepseek-flash · low |
 | `test-engineer` | behavioral/regression tests and validation | deepseek/deepseek-flash · low |
-| `reviewer` | correctness, regressions, contracts and architecture review | deepseek/deepseek-v4-pro · high |
-| `requirements-reviewer` | acceptance against the original request | deepseek/deepseek-v4-pro · high |
-| `security-reviewer` | security-sensitive changed surfaces only | deepseek/deepseek-v4-pro · high |
-| `architect` | rare architecture escalation | deepseek/deepseek-v4-pro · high |
-| `oracle` | last-resort reasoning escalation | deepseek/deepseek-v4-pro · max |
+| `reviewer` | correctness, regressions, contracts and architecture review | deepseek/deepseek-flash · max |
+| `requirements-reviewer` | acceptance against the original request | deepseek/deepseek-flash · max |
+| `security-reviewer` | security-sensitive changed surfaces only | deepseek/deepseek-flash · max |
+| `architect` | rare architecture escalation | deepseek/deepseek-flash · max |
+| `oracle` | last-resort reasoning escalation | deepseek/deepseek-flash · max |
 
 Domain agents (inline in `~/.config/opencode/opencode.json`):
 

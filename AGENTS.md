@@ -37,11 +37,11 @@ Delegate instead:
 | `implementer` | subagent | no web; no MCP; no skills | bounded implementation | deepseek/deepseek-flash · high |
 | `worker` | subagent | no web; no MCP; no skills | mechanical edits, commands, diagnostics, narrow fixes | deepseek/deepseek-flash · low |
 | `test-engineer` | subagent | no web; no MCP; no skills | behavioral/regression tests and validation | deepseek/deepseek-flash · low |
-| `reviewer` | subagent | no web; no MCP; no skills | correctness, regression, contracts, architecture review | deepseek/deepseek-v4-pro · high |
-| `requirements-reviewer` | subagent | no web; no MCP; no skills | acceptance against the original request | deepseek/deepseek-v4-pro · high |
-| `security-reviewer` | subagent | no web; no MCP; no skills | security-sensitive changed surfaces only | deepseek/deepseek-v4-pro · high |
-| `architect` | subagent | no web; no MCP; no skills | rare architecture escalation | deepseek/deepseek-v4-pro · high |
-| `oracle` | subagent | no web; no MCP; no skills | last-resort reasoning escalation | deepseek/deepseek-v4-pro · max |
+| `reviewer` | subagent | no web; no MCP; no skills | correctness, regression, contracts, architecture review | deepseek/deepseek-flash · max |
+| `requirements-reviewer` | subagent | no web; no MCP; no skills | acceptance against the original request | deepseek/deepseek-flash · max |
+| `security-reviewer` | subagent | no web; no MCP; no skills | security-sensitive changed surfaces only | deepseek/deepseek-flash · max |
+| `architect` | subagent | no web; no MCP; no skills | rare architecture escalation | deepseek/deepseek-flash · max |
+| `oracle` | subagent | no web; no MCP; no skills | last-resort reasoning escalation | deepseek/deepseek-flash · max |
 | `web-browser-agent` | all | MCP `browser_*`; no skills | interactive browser, logged-in pages, page captures | deepseek/deepseek-flash · low |
 | `devops` | all | MCP `grafana_*`, `browser_*`; no skills | Grafana / observability / infra | deepseek/deepseek-flash · high |
 | `motion-designer` | all | MCP `synthcut_*`, `remotion_*`, `browser_*`; skills: `video-shotcraft` `remotion-*` `motion-graphics` `cinematic-camera` `article-highlights` `terminal-inserts` `kinetic-reel` | video / motion graphics | deepseek/deepseek-flash · high |

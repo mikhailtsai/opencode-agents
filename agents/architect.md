@@ -1,7 +1,7 @@
 ---
 description: Escalation architect for consequential cross-cutting design decisions that the default agents cannot resolve confidently. Use sparingly.
 mode: subagent
-model: deepseek/deepseek-v4-pro#high
+model: deepseek/deepseek-flash#max
 permissions:
   - action: edit
     resource: "*"

@@ -1,7 +1,7 @@
 ---
 description: Independent read-only reviewer focused on correctness, regressions, contracts, architecture risks, and missing validation. Use after meaningful implementation.
 mode: subagent
-model: deepseek/deepseek-v4-pro#high
+model: deepseek/deepseek-flash#max
 permissions:
   - action: edit
     resource: "*"

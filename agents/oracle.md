@@ -1,7 +1,7 @@
 ---
 description: Very rare final escalation for a high-impact reasoning blocker that remains unresolved after the architect escalation.
 mode: subagent
-model: deepseek/deepseek-v4-pro#max
+model: deepseek/deepseek-flash#max
 permissions:
   - action: edit
     resource: "*"

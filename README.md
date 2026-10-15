@@ -12,7 +12,7 @@ Agents and skills are installed globally so they are available in every reposito
 - Core agents → `~/.config/opencode/agent/` (copy `agents/*.md`)
 - Skills → `~/.config/opencode/skills/` (copy `.opencode/skills/*`)
 
-The six domain agents (`web-browser-agent`, `devops`, `motion-designer`, `uxui`, `gamedev`, `blender`) are
+The seven domain agents (`web-browser-agent`, `devops`, `motion-designer`, `uxui`, `gamedev`, `blender`, `project-manager`) are
 defined inline in `~/.config/opencode/opencode.json` under `agent`, not as files, because they bind
 the MCP servers and skill paths declared in that same file. They are not part of this repository.
 
@@ -48,6 +48,7 @@ Domain agents (inline in `~/.config/opencode/opencode.json`):
 | `uxui` | product / UX design (placeholder) | deepseek/deepseek-flash · high |
 | `gamedev` | game development; skills: `ref2game`, `studioigor` | deepseek/deepseek-flash · high |
 | `blender` | Blender 3D modeling, animation, rendering, scene scripting (official Blender Lab MCP) | deepseek/deepseek-flash · high |
+| `project-manager` | task tracking via Linear, GitLab MRs, browser checks | deepseek/deepseek-flash · high |
 
 Permissions mirror each role's sandbox: read-only roles deny edits; write roles can edit and run
 commands. Pro-tier agents (`reviewer`, `requirements-reviewer`, `security-reviewer`, `architect`,

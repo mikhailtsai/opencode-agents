@@ -25,6 +25,7 @@ permission:
     uxui: allow
     gamedev: allow
     blender: allow
+    project-manager: allow
   webfetch: deny
   websearch: deny
   bash:

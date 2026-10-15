@@ -19,6 +19,7 @@ Delegate instead:
 | product / UX design | `uxui` |
 | game development | `gamedev` |
 | Blender / 3D modeling, animation, rendering | `blender` |
+| tasks / issue tracking (Linear), MR links (GitLab) | `project-manager` |
 | code change | `implementer` / `worker` |
 | tests | `test-engineer` |
 | review | `reviewer` / `requirements-reviewer` / `security-reviewer` |
@@ -47,10 +48,11 @@ Delegate instead:
 | `uxui` | all | no web; no MCP; no skills (placeholder) | product / UX design | deepseek/deepseek-flash · high |
 | `gamedev` | all | no web; no MCP; skills: `ref2game` `studioigor` | game development: reference→playable 2D slice, idea→release pipeline | deepseek/deepseek-flash · high |
 | `blender` | all | MCP `blender_*`; no skills | Blender 3D modeling, animation, rendering, scene scripting | deepseek/deepseek-flash · high |
+| `project-manager` | all | MCP `linear_*`, `gitlab_*`, `browser_*`; no skills | task tracking: read issues/comments/attachments, move to In Progress, link MRs | deepseek/deepseek-flash · high |
 
 `solo` is a standalone primary agent with full tool access; it does the work itself and is not part of the orchestrated routing team.
 
-Domain agents (`web-browser-agent`, `devops`, `motion-designer`, `uxui`, `gamedev`, `blender`) are installed in
+Domain agents (`web-browser-agent`, `devops`, `motion-designer`, `uxui`, `gamedev`, `blender`, `project-manager`) are installed in
 the global OpenCode config; the orchestrator's task allow-list includes them.
 
 ## Routing
@@ -65,6 +67,7 @@ complexity genuinely requires it — never on every request.
 - bug/failure → `researcher` when the root cause is unknown → `implementer` → `test-engineer`
 - ambiguous feature → add `product-analyst`
 - unclear cross-system flow → add `system-analyst`
+- task / issue tracking, MR links → `project-manager`
 - substantial/risky change → `test-engineer` + risk-selected reviewers
 - security-sensitive change → add `security-reviewer`
 - acceptance uncertainty → add `requirements-reviewer`

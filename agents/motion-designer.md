@@ -1,6 +1,6 @@
 ---
 description: "Motion Designer — director for cinematic product/promo videos: storyboard (video-shotcraft) -> Remotion + Three.js -> SynthCut finish -> MP4"
-mode: all
+mode: subagent
 model: deepseek/deepseek-flash#high
 permissions:
   - action: "synthcut_*"

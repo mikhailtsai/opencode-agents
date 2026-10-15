@@ -4,24 +4,24 @@ Agents are installed globally (`~/.config/opencode/agent/`, skills in `~/.config
 and apply in every repository. This repository is the single source of truth: `scripts/install.sh`
 symlinks everything into `~/.config/opencode/`, so the repo is edited, never the installed copies.
 The `orchestrator` is the primary, read-only router: it delegates every change and owns the outcome.
-Each agent is pinned to a DeepSeek model and reasoning effort (see the table).
+Each agent file declares a default DeepSeek model and reasoning effort (the `model:` line, shown in
+the table); `/subagents` can override any subagent at runtime.
 
 ## Orchestrator boundaries
 
 You (orchestrator) cannot `edit`, `webfetch`, `websearch`, or use MCP tools. Never attempt them.
 You are also the only agent permitted to spawn subagents (`subagent`) and to set subagent models
-(`set_subagent_model`) — both are denied by the global rules, and most agents also deny `subagent`
-locally. Delegate instead:
+(`set_subagent_model`, `set_subagent_models`) — both are denied by the global rules, and most agents
+also deny `subagent` locally. Delegate instead:
 
 | Need | Delegate to |
 |---|---|
 | external docs / web search | `researcher` |
-| interactive browser, logged-in pages, page captures | `web-browser-agent` |
-| Grafana / observability / infra | `devops` |
+| interactive browser, logged-in pages, page captures | `web-crawler` |
+| Grafana / observability / infra (tsai.tech) | `devops-tsai` |
 | video / motion graphics | `motion-designer` |
 | product / UX design | `uxui` |
-| game development | `gamedev` |
-| Blender / 3D modeling, animation, rendering | `blender` |
+| game development, Blender / 3D modeling, animation, rendering | `game-developer` |
 | tasks / issue tracking (Linear), MR links (GitLab) | `project-manager` |
 | code change | `implementer` / `worker` |
 | tests | `test-engineer` |
@@ -33,33 +33,42 @@ locally. Delegate instead:
 | Agent | Mode | Capabilities | When to use | Model · effort |
 |---|---|---|---|---|
 | `orchestrator` | primary | no MCP; skills: `debug` `plan` `review-loop` `verify` | route work, own the outcome | deepseek/deepseek-flash · high |
-| `solo` | primary | full access except `linear_*`/`gitlab_*`: read/edit/bash/web/MCP/skills; no delegation | standalone do-everything agent that bypasses orchestration | deepseek/deepseek-flash · high |
-| `researcher` | subagent | `webfetch` + `websearch`; no MCP; no skills | repo investigation + external docs/APIs | deepseek/deepseek-flash · low |
-| `product-analyst` | subagent | no web; no MCP; no skills | requirements, business rules, acceptance criteria, edge cases | deepseek/deepseek-flash · high |
-| `system-analyst` | subagent | no web; no MCP; no skills | end-to-end flows, state/data, integrations, boundaries | deepseek/deepseek-flash · high |
+| `build` | primary | full access except `linear_*`/`gitlab_*`: read/edit/bash/web/MCP/skills; no delegation | standalone do-everything agent that bypasses orchestration | deepseek/deepseek-flash · high |
+| `researcher` | subagent | MCP `browser_*` + `webfetch`/`websearch`; no skills | repo investigation + external docs/APIs | deepseek/deepseek-flash · max |
+| `product-analyst` | subagent | no web; no MCP; no skills | requirements, business rules, acceptance criteria, edge cases | deepseek/deepseek-flash · max |
+| `system-analyst` | subagent | no web; no MCP; no skills | end-to-end flows, state/data, integrations, boundaries | deepseek/deepseek-flash · max |
 | `implementer` | subagent | no web; no MCP; no skills | bounded implementation | deepseek/deepseek-flash · high |
 | `worker` | subagent | no web; no MCP; no skills | mechanical edits, commands, diagnostics, narrow fixes | deepseek/deepseek-flash · low |
 | `test-engineer` | subagent | no web; no MCP; no skills | behavioral/regression tests and validation | deepseek/deepseek-flash · low |
-| `reviewer` | subagent | no web; no MCP; no skills | correctness, regression, contracts, architecture review | deepseek/deepseek-flash · max |
+| `reviewer` | subagent | MCP `browser_*`; no web; no skills | correctness, regression, contracts, architecture review | deepseek/deepseek-flash · high |
 | `requirements-reviewer` | subagent | no web; no MCP; no skills | acceptance against the original request | deepseek/deepseek-flash · max |
 | `security-reviewer` | subagent | no web; no MCP; no skills | security-sensitive changed surfaces only | deepseek/deepseek-flash · max |
 | `architect` | subagent | no web; no MCP; no skills | rare architecture escalation | deepseek/deepseek-flash · max |
 | `oracle` | subagent | no web; no MCP; no skills | last-resort reasoning escalation | deepseek/deepseek-flash · max |
-| `web-browser-agent` | all | MCP `browser_*`; no skills | interactive browser, logged-in pages, page captures | deepseek/deepseek-flash · low |
-| `devops` | all | MCP `grafana_*`, `browser_*`; no skills | Grafana / observability / infra | deepseek/deepseek-flash · high |
-| `motion-designer` | all | MCP `synthcut_*`, `remotion_*`, `browser_*`; skills: `video-shotcraft` `remotion-*` `motion-graphics` `cinematic-camera` `article-highlights` `terminal-inserts` `kinetic-reel` | video / motion graphics | deepseek/deepseek-flash · high |
-| `uxui` | all | no web; no MCP; no skills (placeholder) | product / UX design | deepseek/deepseek-flash · high |
-| `gamedev` | all | no web; no MCP; skills: `ref2game` `studioigor` | game development: reference→playable 2D slice, idea→release pipeline | deepseek/deepseek-flash · high |
-| `blender` | all | MCP `blender_*`; no skills | Blender 3D modeling, animation, rendering, scene scripting | deepseek/deepseek-flash · high |
-| `project-manager` | all | MCP `linear_*`, `gitlab_*`, `browser_*`; no skills | task tracking: read issues/comments/attachments, move to In Progress, link MRs | deepseek/deepseek-flash · high |
+| `web-crawler` | subagent | MCP `browser_*`; no skills | interactive browser, logged-in pages, page captures | deepseek/deepseek-flash · low |
+| `devops-tsai` | subagent | MCP `grafana_*`; no browser; no skills | DevOps for tsai.tech: Grafana / observability / infra | deepseek/deepseek-flash · high |
+| `motion-designer` | subagent | MCP `synthcut_*`, `remotion_*`, `browser_*`; skills: `video-shotcraft` `remotion-*` `motion-graphics` `cinematic-camera` `article-highlights` `terminal-inserts` `kinetic-reel` | video / motion graphics | deepseek/deepseek-flash · high |
+| `uxui` | subagent | no web; no MCP; no skills (placeholder) | product / UX design | deepseek/deepseek-flash · high |
+| `game-developer` | subagent | MCP `blender_*`; no browser; skills: `ref2game` `studioigor` | game development, Blender / 3D modeling, animation, rendering, scene scripting | deepseek/deepseek-flash · high |
+| `project-manager` | subagent | MCP `linear_*`, `gitlab_*`; no browser; no skills | task tracking: read issues/comments/attachments, move to In Progress, link MRs | deepseek/deepseek-flash · low |
 
-`solo` is a standalone primary agent with full tool access apart from the Linear and GitLab MCP
+Browser access (`browser_*`) exists only for `researcher`, `reviewer`, `web-crawler`,
+`motion-designer`, and `build` (the full-access primary).
+
+`build` is a standalone primary agent with full tool access apart from the Linear and GitLab MCP
 families, which only `project-manager` may use; it does the work itself and is not part of the
 orchestrated routing team.
 
-Domain agents (`web-browser-agent`, `devops`, `motion-designer`, `uxui`, `gamedev`, `blender`, `project-manager`) are repo agent
+Domain agents (`web-crawler`, `devops-tsai`, `motion-designer`, `uxui`, `game-developer`, `project-manager`) are repo agent
 files (`agents/*.md`) like the core agents — not inline JSON — and `scripts/install.sh` installs them into the global
 `~/.config/opencode/agent/`; the orchestrator's task allow-list includes them.
+
+`/subagents` sets every subagent's model at once: it asks one question offering the four presets
+(`deepseek`, `opencode-free`, `codex`, `claude-code`) plus `none` to reset, then calls
+`set_subagent_models` a single time. The result is written to `~/.config/opencode/agent-models.json`
+(runtime state, gitignored, re-read on every subagent launch), so it applies without a restart. The
+per-file `model:` lines are defaults; a runtime override wins for subagents. `set_subagent_model`
+remains for one-off per-agent overrides.
 
 `project-manager` is the only agent permitted to use the Linear (`linear_*`) and GitLab (`gitlab_*`) tools. Route every
 task/issue-tracking and MR-linking request through it; no other agent may call those MCP families.
@@ -82,7 +91,7 @@ complexity genuinely requires it — never on every request.
 - acceptance uncertainty → add `requirements-reviewer`
 - repeated failure or illegible environment → improve the repository, not the prompt
 - complex multi-step work → decompose into bounded slices before implementing
-- normal chain: `implementer` (Flash high) → `test-engineer` → `reviewer` (max) only when the change is significant
+- normal chain: `implementer` (Flash high) → `test-engineer` → `reviewer` (high) only when the change is significant
 - simple/mechanical task → delegate straight to Flash (`worker`/`implementer`); no separate planning step
 - `implementer` fails twice → escalate to `architect` (max)
 - debug dead-end (root cause still unknown after evidence-gathering) → escalate to `oracle` (Pro max)

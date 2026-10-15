@@ -1,7 +1,7 @@
 ---
 description: Read-only end-to-end system analyst for flows crossing UI, services, APIs, persistence, events, jobs, and integrations. Use when a cross-system flow is unclear before implementation.
 mode: subagent
-model: deepseek/deepseek-flash#high
+model: deepseek/deepseek-flash#max
 permissions:
   - action: edit
     resource: "*"

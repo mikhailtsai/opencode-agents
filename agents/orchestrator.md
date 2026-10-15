@@ -46,19 +46,16 @@ permissions:
     resource: "motion-designer"
     effect: allow
   - action: subagent
-    resource: "devops"
+    resource: "devops-tsai"
     effect: allow
   - action: subagent
-    resource: "web-browser-agent"
+    resource: "web-crawler"
     effect: allow
   - action: subagent
     resource: "uxui"
     effect: allow
   - action: subagent
-    resource: "gamedev"
-    effect: allow
-  - action: subagent
-    resource: "blender"
+    resource: "game-developer"
     effect: allow
   - action: subagent
     resource: "project-manager"
@@ -100,6 +97,9 @@ permissions:
     resource: "verify"
     effect: allow
   - action: set_subagent_model
+    resource: "*"
+    effect: allow
+  - action: set_subagent_models
     resource: "*"
     effect: allow
 ---

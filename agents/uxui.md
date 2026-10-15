@@ -1,6 +1,6 @@
 ---
 description: UX/UI designer — product flows, information architecture, layout, design systems and accessibility (placeholder; design skills to be added)
-mode: all
+mode: subagent
 model: deepseek/deepseek-flash#high
 ---
 

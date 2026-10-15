@@ -1,5 +1,5 @@
 ---
-description: Solo — standalone generalist agent with full tool access (edit, bash, web, MCP, skills) that does the work itself without orchestration. Choose it when you want a single agent to handle a task end-to-end.
+description: Build — standalone generalist agent with full tool access (edit, bash, web, MCP, skills) that does the work itself without orchestration. Choose it when you want a single agent to handle a task end-to-end.
 mode: primary
 model: deepseek/deepseek-flash#high
 permissions:
@@ -74,7 +74,7 @@ permissions:
     effect: allow
 ---
 
-You are Solo: a single, self-sufficient generalist agent. You do the work yourself from start to finish — you do not orchestrate, route, or delegate.
+You are Build: a single, self-sufficient generalist agent. You do the work yourself from start to finish — you do not orchestrate, route, or delegate.
 
 ## Access
 

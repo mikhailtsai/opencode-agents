@@ -158,6 +158,7 @@ check_secrets() {
   local missing=()
   [ -f "$CONF/secrets/grafana-bearer" ]         || missing+=("grafana-bearer")
   [ -f "$CONF/secrets/grafana-sa-token" ]       || missing+=("grafana-sa-token")
+  [ -f "$CONF/gitlab.token" ]                   || missing+=("gitlab.token")
   if [ "${#missing[@]}" -eq 0 ]; then
     return 0
   fi
@@ -167,6 +168,7 @@ check_secrets() {
   say "   The canonical config references:"
   say "     mcp.servers.grafana.headers.Authorization            -> {file:$CONF/secrets/grafana-bearer}"
   say "     mcp.servers.grafana.headers.X-Grafana-Service-Account-Token -> {file:$CONF/secrets/grafana-sa-token}"
+  say "     mcp.servers.gitlab.environment.GITLAB_PERSONAL_ACCESS_TOKEN -> {file:$CONF/gitlab.token}"
   say "   If the live config still holds the values inline, migrate them first"
   say "   (BEFORE install.sh symlinks the config):"
   say "     $REPO/scripts/migrate-secrets.sh"
@@ -175,9 +177,12 @@ check_secrets() {
   say "     echo -n '<grafana-bearer-token>'  > \"$CONF/secrets/grafana-bearer\""
   say "     echo -n '<grafana-service-account-token>' > \"$CONF/secrets/grafana-sa-token\""
   say "     chmod 600 \"$CONF/secrets/grafana-bearer\" \"$CONF/secrets/grafana-sa-token\""
+  say "   $CONF/gitlab.token holds the raw GitLab PAT with no prefix, should be chmod 600, and must never be committed:"
+  say "     echo -n '<gitlab-personal-access-token>' > \"$CONF/gitlab.token\" && chmod 600 \"$CONF/gitlab.token\""
   say "   Or link an existing file elsewhere:"
   say "     ln -s /path/to/grafana-bearer       \"$CONF/secrets/grafana-bearer\""
   say "     ln -s /path/to/grafana-sa-token     \"$CONF/secrets/grafana-sa-token\""
+  say "     ln -s /path/to/gitlab.token         \"$CONF/gitlab.token\""
   return 1
 }
 
@@ -206,6 +211,7 @@ install_link "agent"      "$REPO/agents"                       "$CONF/agent"    
 
 # File symlinks: config, instructions.
 install_link "config"     "$REPO/config/opencode.json"         "$CONF/opencode.json"  || true
+install_link "cli"        "$REPO/config/cli.json"              "$CONF/cli.json"       || true
 install_link "instructions" "$REPO/AGENTS.md"                  "$CONF/AGENTS.md"      || true
 
 # Plugin: the FILE form, because a symlinked plugin *directory* is not followed.

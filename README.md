@@ -33,9 +33,19 @@ not backed up. A second run is a no-op.
 already-used config directory does not pick up edits. The one exception is the subagent model
 presets below, which are re-read on every subagent launch and apply immediately.
 
-`~/.config/opencode/agent-models.json` is **runtime state**, not part of this repo: the
-`agent-models` plugin writes it when you change subagent models. It is gitignored here so it can
-never be committed by accident.
+The global config directory also holds entries this repo does **not** manage, each for one reason:
+
+- `~/.config/opencode/agent-models.json` — **runtime state**: the `agent-models` plugin writes it
+  when you change subagent models. It is gitignored here so it can never be committed by accident.
+- `~/.config/opencode/service.json` — **runtime state**: the OpenCode remote/share service writes it,
+  and it holds a plaintext `password` credential field, so it must never be committed or symlinked.
+- `~/.config/opencode/opencode-quota/` — **runtime cache/state**: written and read by the
+  `@slkiser/opencode-quota` plugin.
+- `~/.config/opencode/backups/` — **installer scratch**: created by `scripts/install.sh` when it
+  replaces a real file with a symlink; not tracked by git.
+- `~/.config/opencode/.gitignore` — **inert leftover**: it ignored only the deleted V1 SDK files
+  (`node_modules`, `package.json`, `package-lock.json`, `bun.lock`), so it matches nothing now but is
+  kept deliberately.
 
 ## Layout
 

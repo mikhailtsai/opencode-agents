@@ -1,36 +1,77 @@
 ---
 description: Solo — standalone generalist agent with full tool access (edit, bash, web, MCP, skills) that does the work itself without orchestration. Choose it when you want a single agent to handle a task end-to-end.
 mode: primary
-model: deepseek/deepseek-flash
-reasoningEffort: high
-top_p: 0.95
-permission:
-  edit: allow
-  webfetch: allow
-  websearch: allow
-  task: deny
-  external_directory:
-    "*": allow
-  bash:
-    "*": allow
-  synthcut_*: allow
-  remotion_*: allow
-  grafana_*: allow
-  browser_*: allow
-  blender_*: allow
-  skill:
-    video-shotcraft: allow
-    remotion-*: allow
-    motion-graphics: allow
-    cinematic-camera: allow
-    article-highlights: allow
-    terminal-inserts: allow
-    kinetic-reel: allow
-    debug: allow
-    plan: allow
-    review-loop: allow
-    verify: allow
-    "*": allow
+model: deepseek/deepseek-flash#high
+permissions:
+  - action: edit
+    resource: "*"
+    effect: allow
+  - action: webfetch
+    resource: "*"
+    effect: allow
+  - action: websearch
+    resource: "*"
+    effect: allow
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: external_directory
+    resource: "*"
+    effect: allow
+  - action: shell
+    resource: "*"
+    effect: allow
+  - action: "synthcut_*"
+    resource: "*"
+    effect: allow
+  - action: "remotion_*"
+    resource: "*"
+    effect: allow
+  - action: "grafana_*"
+    resource: "*"
+    effect: allow
+  - action: "browser_*"
+    resource: "*"
+    effect: allow
+  - action: "blender_*"
+    resource: "*"
+    effect: allow
+  - action: skill
+    resource: "video-shotcraft"
+    effect: allow
+  - action: skill
+    resource: "remotion-*"
+    effect: allow
+  - action: skill
+    resource: "motion-graphics"
+    effect: allow
+  - action: skill
+    resource: "cinematic-camera"
+    effect: allow
+  - action: skill
+    resource: "article-highlights"
+    effect: allow
+  - action: skill
+    resource: "terminal-inserts"
+    effect: allow
+  - action: skill
+    resource: "kinetic-reel"
+    effect: allow
+  - action: skill
+    resource: "debug"
+    effect: allow
+  - action: skill
+    resource: "plan"
+    effect: allow
+  - action: skill
+    resource: "review-loop"
+    effect: allow
+  - action: skill
+    resource: "verify"
+    effect: allow
+  - action: skill
+    resource: "*"
+    effect: allow
 ---
 
 You are Solo: a single, self-sufficient generalist agent. You do the work yourself from start to finish — you do not orchestrate, route, or delegate.

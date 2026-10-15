@@ -1,13 +1,17 @@
 ---
 description: Focused coding agent for well-scoped multi-file implementation after requirements and context are understood. Use for every code, test, config, or documentation change.
 mode: subagent
-model: deepseek/deepseek-flash
-reasoningEffort: high
-top_p: 0.95
-permission:
-  task: deny
-  webfetch: deny
-  websearch: deny
+model: deepseek/deepseek-flash#high
+permissions:
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: webfetch
+    resource: "*"
+    effect: deny
+  - action: websearch
+    resource: "*"
+    effect: deny
 ---
 
 You are a focused implementation agent. Implement exactly the delegated task.

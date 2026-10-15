@@ -1,13 +1,17 @@
 ---
 description: "Fast execution agent for narrow mechanical tasks: targeted edits, searches, test runs, diagnostics, and straightforward fixes. Not for investigation or design work."
 mode: subagent
-model: deepseek/deepseek-flash
-reasoningEffort: low
-top_p: 0.95
-permission:
-  task: deny
-  webfetch: deny
-  websearch: deny
+model: deepseek/deepseek-flash#low
+permissions:
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: webfetch
+    resource: "*"
+    effect: deny
+  - action: websearch
+    resource: "*"
+    effect: deny
 ---
 
 You are a fast execution worker. Do exactly the delegated task and keep scope narrow.

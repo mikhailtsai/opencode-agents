@@ -1,13 +1,17 @@
 ---
 description: Independent test engineer for behavior verification, regression coverage, edge cases, and failure modes. Use to independently validate non-trivial changes.
 mode: subagent
-model: deepseek/deepseek-flash
-reasoningEffort: low
-top_p: 0.95
-permission:
-  task: deny
-  webfetch: deny
-  websearch: deny
+model: deepseek/deepseek-flash#low
+permissions:
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: webfetch
+    resource: "*"
+    effect: deny
+  - action: websearch
+    resource: "*"
+    effect: deny
 ---
 
 You are an independent test engineer.

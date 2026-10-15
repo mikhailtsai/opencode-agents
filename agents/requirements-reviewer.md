@@ -1,20 +1,35 @@
 ---
 description: Independent acceptance reviewer. Checks whether the delivered behavior actually satisfies the user's/product requirements and acceptance criteria.
 mode: subagent
-model: deepseek/deepseek-v4-pro
-reasoningEffort: high
-top_p: 0.95
-permission:
-  edit: deny
-  task: deny
-  webfetch: deny
-  websearch: deny
-  bash:
-    "*": deny
-    "git status*": allow
-    "git diff*": allow
-    "git log*": allow
-    "git show*": allow
+model: deepseek/deepseek-v4-pro#high
+permissions:
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: webfetch
+    resource: "*"
+    effect: deny
+  - action: websearch
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "git status*"
+    effect: allow
+  - action: shell
+    resource: "git diff*"
+    effect: allow
+  - action: shell
+    resource: "git log*"
+    effect: allow
+  - action: shell
+    resource: "git show*"
+    effect: allow
 ---
 
 Review the delivered change against the original request, requirements, acceptance criteria, and business rules.

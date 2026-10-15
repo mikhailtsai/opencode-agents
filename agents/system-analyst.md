@@ -1,20 +1,35 @@
 ---
 description: Read-only end-to-end system analyst for flows crossing UI, services, APIs, persistence, events, jobs, and integrations. Use when a cross-system flow is unclear before implementation.
 mode: subagent
-model: deepseek/deepseek-flash
-reasoningEffort: high
-top_p: 0.95
-permission:
-  edit: deny
-  task: deny
-  webfetch: deny
-  websearch: deny
-  bash:
-    "*": deny
-    "git status*": allow
-    "git diff*": allow
-    "git log*": allow
-    "git show*": allow
+model: deepseek/deepseek-flash#high
+permissions:
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: webfetch
+    resource: "*"
+    effect: deny
+  - action: websearch
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "git status*"
+    effect: allow
+  - action: shell
+    resource: "git diff*"
+    effect: allow
+  - action: shell
+    resource: "git log*"
+    effect: allow
+  - action: shell
+    resource: "git show*"
+    effect: allow
 ---
 
 You are a read-only system analyst.

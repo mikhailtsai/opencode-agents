@@ -1,45 +1,104 @@
 ---
 description: Primary orchestrator and single entry point. Routes a request to the smallest useful subagent or domain agent and owns the outcome. Read-only - it delegates every change.
 mode: primary
-model: deepseek/deepseek-flash
-reasoningEffort: high
-top_p: 0.95
-permission:
-  edit: deny
-  task:
-    "*": deny
-    product-analyst: allow
-    system-analyst: allow
-    researcher: allow
-    implementer: allow
-    worker: allow
-    test-engineer: allow
-    reviewer: allow
-    requirements-reviewer: allow
-    security-reviewer: allow
-    architect: allow
-    oracle: allow
-    motion-designer: allow
-    devops: allow
-    web-browser-agent: allow
-    uxui: allow
-    gamedev: allow
-    blender: allow
-    project-manager: allow
-  webfetch: deny
-  websearch: deny
-  bash:
-    "*": deny
-    "git status*": allow
-    "git diff*": allow
-    "git log*": allow
-    "git show*": allow
-    "codeburn*": allow
-  skill:
-    debug: allow
-    plan: allow
-    review-loop: allow
-    verify: allow
+model: deepseek/deepseek-flash#high
+permissions:
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: subagent
+    resource: "product-analyst"
+    effect: allow
+  - action: subagent
+    resource: "system-analyst"
+    effect: allow
+  - action: subagent
+    resource: "researcher"
+    effect: allow
+  - action: subagent
+    resource: "implementer"
+    effect: allow
+  - action: subagent
+    resource: "worker"
+    effect: allow
+  - action: subagent
+    resource: "test-engineer"
+    effect: allow
+  - action: subagent
+    resource: "reviewer"
+    effect: allow
+  - action: subagent
+    resource: "requirements-reviewer"
+    effect: allow
+  - action: subagent
+    resource: "security-reviewer"
+    effect: allow
+  - action: subagent
+    resource: "architect"
+    effect: allow
+  - action: subagent
+    resource: "oracle"
+    effect: allow
+  - action: subagent
+    resource: "motion-designer"
+    effect: allow
+  - action: subagent
+    resource: "devops"
+    effect: allow
+  - action: subagent
+    resource: "web-browser-agent"
+    effect: allow
+  - action: subagent
+    resource: "uxui"
+    effect: allow
+  - action: subagent
+    resource: "gamedev"
+    effect: allow
+  - action: subagent
+    resource: "blender"
+    effect: allow
+  - action: subagent
+    resource: "project-manager"
+    effect: allow
+  - action: webfetch
+    resource: "*"
+    effect: deny
+  - action: websearch
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "git status*"
+    effect: allow
+  - action: shell
+    resource: "git diff*"
+    effect: allow
+  - action: shell
+    resource: "git log*"
+    effect: allow
+  - action: shell
+    resource: "git show*"
+    effect: allow
+  - action: shell
+    resource: "codeburn*"
+    effect: allow
+  - action: skill
+    resource: "debug"
+    effect: allow
+  - action: skill
+    resource: "plan"
+    effect: allow
+  - action: skill
+    resource: "review-loop"
+    effect: allow
+  - action: skill
+    resource: "verify"
+    effect: allow
 ---
 
 You are the primary software-development orchestrator: a read-only router and the single entry

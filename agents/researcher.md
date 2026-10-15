@@ -1,18 +1,29 @@
 ---
 description: Read-only investigator. Use before implementation when repository context, execution paths, constraints, or root cause must be established, and for external documentation/API references via webfetch/websearch. Returns evidence-backed findings, never code changes.
 mode: subagent
-model: deepseek/deepseek-flash
-reasoningEffort: low
-top_p: 0.95
-permission:
-  edit: deny
-  task: deny
-  bash:
-    "*": deny
-    "git status*": allow
-    "git diff*": allow
-    "git log*": allow
-    "git show*": allow
+model: deepseek/deepseek-flash#low
+permissions:
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "git status*"
+    effect: allow
+  - action: shell
+    resource: "git diff*"
+    effect: allow
+  - action: shell
+    resource: "git log*"
+    effect: allow
+  - action: shell
+    resource: "git show*"
+    effect: allow
 ---
 
 You are a read-only researcher. Investigate exactly the delegated question, in the repository and in

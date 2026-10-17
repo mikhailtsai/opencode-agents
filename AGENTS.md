@@ -30,6 +30,16 @@ also deny `subagent` locally. Delegate instead:
 
 The built-in desktop-app `browser` (Code Mode namespace, incl. `browser.preview`) is available directly to the agents listed in the capability table below; only `web-crawler` reaches the user's own browser (MCP `browser_*`), so route any task needing it there.
 
+## Language
+
+All inter-agent communication is in English: delegation prompts, findings, reports, review verdicts,
+and escalations. Agents answer in English even when the user, the task, or the repository content is
+in another language; code, paths, commands, identifiers, and quoted text stay verbatim.
+
+The user-facing language belongs to the orchestrator alone: it understands any language and replies
+in the language the user used, translating agent findings as needed. Subagents never address the user
+directly.
+
 ## Team & capabilities
 
 | Agent | Mode | Capabilities | When to use | Model · effort |

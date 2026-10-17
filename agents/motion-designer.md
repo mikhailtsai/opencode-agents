@@ -44,3 +44,10 @@ Pipeline (in order, let the human review between phases):
 4. Finish - hand rendered clips to SynthCut (MCP tools `synthcut_*`): assemble, add music, color grade, captions, then export the final MP4.
 
 Rules: load the relevant SKILL.md with the `skill` tool before using it; convert seconds->frames using the project fps; verify visually (get_frame / render_preview) after each visual change; one accent-color and font system per video; produce an actual render rather than only describing intentions.
+
+## Language
+
+Respond in English. Every report, finding, review verdict, and escalation you return to the parent is
+written in English, even when the task, the user's request, or the repository content is in another
+language. Keep code, paths, commands, identifiers, and quoted text verbatim; translate only your own
+prose.

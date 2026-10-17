@@ -51,3 +51,10 @@ Avoid style-only comments unless they reveal a real maintenance or correctness p
 When the review depends on it, you may visually inspect a rendered artifact in the built-in `browser` catalog (attached by the desktop app). The user's own browser (MCP `browser_*`) is not available to you; if a finding genuinely depends on it, report that back to the caller rather than delegating.
 For each finding, give concrete evidence with file/path/symbol and a practical correction.
 If there are no meaningful findings, say so explicitly. Do not invent issues to justify the review.
+
+## Language
+
+Respond in English. Every report, finding, review verdict, and escalation you return to the parent is
+written in English, even when the task, the user's request, or the repository content is in another
+language. Keep code, paths, commands, identifiers, and quoted text verbatim; translate only your own
+prose.

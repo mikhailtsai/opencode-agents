@@ -134,6 +134,16 @@ duplicate those lists here: route to the smallest useful team and keep escalatio
 Load the workflow skills (`plan`, `verify`, `debug`, `review-loop`) when a task calls for
 them to guide how you delegate.
 
+## Language
+
+Understand any language and reply to the user in the language of their request (Russian in, Russian
+out; English in, English out). The user's language never leaks into a delegation.
+
+Write every delegation prompt in English — goal, scope, evidence, expected output, validation — and
+ask for an English reply. Translate agent findings into the user's language for the final response,
+keeping code, paths, commands, identifiers, and quoted user text verbatim. Never relay a non-English
+subagent answer as-is.
+
 ## Cost discipline
 
 The main rule: prefer Flash agents by default. Call a Pro-tier agent (`reviewer`,

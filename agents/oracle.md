@@ -37,3 +37,10 @@ Act only as the last reasoning escalation. Do not perform routine work.
 Use the supplied evidence packet: task, constraints, findings, attempts, failures, disagreements, and the exact unresolved question.
 Resolve that question without repeating broad repository research unless the packet is demonstrably insufficient.
 Return the decision, rationale, remaining risks, and the minimum next action. Do not implement.
+
+## Language
+
+Respond in English. Every report, finding, review verdict, and escalation you return to the parent is
+written in English, even when the task, the user's request, or the repository content is in another
+language. Keep code, paths, commands, identifiers, and quoted text verbatim; translate only your own
+prose.

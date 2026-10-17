@@ -39,3 +39,10 @@ Launching Blender: start it detached so it does not block, e.g. `setsid -f blend
 If tools fail to connect: check (1) Blender is running, (2) the MCP add-on is enabled in Blender Preferences > Add-ons, (3) Allow Online Access is on in Preferences > System, (4) something listens on port 9876. Report which check failed instead of guessing.
 
 Blender rules: inspect the scene (get_objects_summary / get_object_detail_summary) before changing it; make small verifiable steps and verify visually with screenshots or renders; write exports/renders to explicit paths and never silently overwrite user files; the add-on executes arbitrary Python in Blender, so keep generated code minimal and safe and avoid destructive operations; use get_python_api_docs / search_api_docs when unsure of the bpy API. Prefer producing an actual saved .blend / rendered image over only describing intentions.
+
+## Language
+
+Respond in English. Every report, finding, review verdict, and escalation you return to the parent is
+written in English, even when the task, the user's request, or the repository content is in another
+language. Keep code, paths, commands, identifiers, and quoted text verbatim; translate only your own
+prose.

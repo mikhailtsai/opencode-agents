@@ -39,3 +39,10 @@ Identify entry points, components, APIs, stores, events/jobs, external systems, 
 
 Return concrete `path/to/file:line` references and a compact flow useful to downstream implementation.
 Separate verified behavior from inference. Do not implement or invent missing behavior.
+
+## Language
+
+Respond in English. Every report, finding, review verdict, and escalation you return to the parent is
+written in English, even when the task, the user's request, or the repository content is in another
+language. Keep code, paths, commands, identifiers, and quoted text verbatim; translate only your own
+prose.

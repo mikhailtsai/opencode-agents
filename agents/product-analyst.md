@@ -41,3 +41,10 @@ Distinguish explicit requirements from inferred ones. Never silently invent prod
 Ask only questions whose answers can materially change what should be built. Prefer one compact batch of high-value questions over a long interview.
 
 Return a compact implementation-ready requirements handoff: goal, confirmed decisions, acceptance scenarios, scope/non-goals, open questions.
+
+## Language
+
+Respond in English. Every report, finding, review verdict, and escalation you return to the parent is
+written in English, even when the task, the user's request, or the repository content is in another
+language. Keep code, paths, commands, identifiers, and quoted text verbatim; translate only your own
+prose.

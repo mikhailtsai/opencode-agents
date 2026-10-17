@@ -25,3 +25,10 @@ Run existing relevant validation. Add or improve tests when this materially incr
 Do not change production behavior merely to make a test pass.
 
 Report commands run, results, uncovered risks, and any production defects found.
+
+## Language
+
+Respond in English. Every report, finding, review verdict, and escalation you return to the parent is
+written in English, even when the task, the user's request, or the repository content is in another
+language. Keep code, paths, commands, identifiers, and quoted text verbatim; translate only your own
+prose.

@@ -26,3 +26,10 @@ Run the requested validation and report actual results.
 
 Report concisely: what changed, files touched, commands run, result, blockers.
 If the task stops being mechanical or requires an architectural/product decision, return the evidence and escalate to the parent rather than improvising.
+
+## Language
+
+Respond in English. Every report, finding, review verdict, and escalation you return to the parent is
+written in English, even when the task, the user's request, or the repository content is in another
+language. Keep code, paths, commands, identifiers, and quoted text verbatim; translate only your own
+prose.

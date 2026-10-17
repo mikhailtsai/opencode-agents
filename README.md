@@ -105,6 +105,9 @@ MCP-bound, but `uxui` uses no MCP tools). Every agent file is in `agents/`; ther
 inline agent definitions in the JSON config. A per-agent coverage assessment lives in
 [`docs/agents-coverage.md`](docs/agents-coverage.md).
 
+Language policy: the orchestrator writes to subagents in English and they answer in English; only the
+orchestrator talks to the user, mirroring the language the user wrote in.
+
 Core agents:
 
 | Agent | Mode | Role | Model · effort |
